@@ -10,16 +10,11 @@ public class Heap {
 	 * @param heapArray
 	 *            unsorted array
 	 */
-	public Heap(Record[] heapArray) {
+	public Heap(Integer[] heapArray) {
 		//array = heapArray;
 		arraySize = 512;
 		//arrayF = arrayFloat;
 	}
-
-    public void insert(Record next) {
-        // TODO Auto-generated method stub
-        
-    }
 
 	public boolean insert(int data) {
 		// if this then you need to make heap bigger
@@ -83,7 +78,7 @@ public class Heap {
 		array[y] = temp;
 	}
 
-    public Record deleteMin() {
+    public Integer deleteMin() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -93,7 +88,7 @@ public class Heap {
         return false;
     }
 
-    public Record[] toArray() {
+    public Integer[] toArray() {
         // TODO Auto-generated method stub
         return null;
     }

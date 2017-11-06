@@ -1,69 +1,77 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class DrBarnettesMagicalSortingFactory {
-    private LinkedList<Record[]> blocks;
+    private LinkedList<Integer[]> id_list;
+    private LinkedList<Float[]> key_list;
     private final int MAX_RECORDS = 512;
     private long time;
 
     public DrBarnettesMagicalSortingFactory(String file) {
-        blocks = null;
+        id_list = null;
         parse(file);
         run();
         System.out.println(file + " " + time);
     }
     
     public void run() {
-        if (blocks != null && blocks.size() > 0) {
+        if (id_list != null && id_list.size() > 0) {
             startTimer();
-            replacementSelection(blocks.get(0), 1);
+            replacementSelection(id_list.get(0), 1);
             stopTimer();
         }
     }
 
     private void parse(String file) {
         Scanner sc = new Scanner(file);
-        LinkedList<Record[]> blocks = Parser.parse(sc);
-        if (blocks.size() == 0) {
+        Parser ps = new Parser();
+        ps.parse(sc);
+        
+        LinkedList<Integer[]> ids = ps.getIDs();
+        LinkedList<Float[]> keys = ps.getKeys();
+        if (ids.size() == 0 || keys.size() == 0) {
             System.out.println("No records found in file.");
             System.exit(1);
         }
-        this.blocks = blocks;
+        this.id_list = ids;
+        this.key_list = keys;
         sc.close();
     }
 
-    private Record[] replacementSelection(Record[] block, int blockIdx) {
+    private Integer[] replacementSelection(Integer[] block, int blockIdx) {
         
         Heap heap = new Heap(block);
-        if (blocks.size() == blockIdx) {
+        if (id_list.size() == blockIdx) {
             return heap.toArray();
         }
         
-        Record[] records = blocks.get(blockIdx);
+        Stack<Integer> records = new Stack<Integer>();
+        records.addAll(Arrays.asList(id_list.get(blockIdx)));
         
         
-        LinkedList<Record> outBuffer = new LinkedList<Record>();
-        Record[] list = new Record[MAX_RECORDS];
+        LinkedList<Integer> outBuffer = new LinkedList<Integer>();
+        int[] list = new int[MAX_RECORDS];
         int idx = 0;
-        do {
-            while (!heap.isEmpty()) {
-                Record min = heap.deleteMin();
-                outBuffer.add(min);
-                if (records.length != 0) {
-                    Record next = records[0];
-                    // TODO shift records array by 1
-                    if (next.key() >= outBuffer.getLast().key()) {
-                        heap.insert(next);
-                    }
-                    else {
-                        list[idx] = next;
-                        idx++;
-                    }
+        while (!heap.isEmpty()) {
+            int min = heap.deleteMin();
+            outBuffer.add(min);
+            if (records.size() != 0) {
+                int next = records.pop();
+                if (next >= outBuffer.getLast()) {
+                    heap.insert(next);
+                }
+                else {
+                    list[idx] = next;
+                    idx++;
                 }
             }
-        } while (!heap.isEmpty());
+            heap = new Heap((Integer[]) outBuffer.toArray());
+            outBuffer = new LinkedList<Integer>();
+        }
 
-        return replacementSelection((Record[]) outBuffer.toArray(),
+        return replacementSelection((Integer[]) outBuffer.toArray(),
                 blockIdx + 1);
     }
     
