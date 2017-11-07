@@ -6,38 +6,75 @@ public class Heap {
 
 	/**
 	 * sets up the heapsorter with a given array (unsorted)
-	 * 
+	 * each array should be holding 8 blocks
 	 * @param heapArray
 	 *            unsorted array
 	 */
-	public Heap(int[] heapArray, float[] arrayF) {
+	public Heap(int[] heapArray, float[] arrayFloat)
+	{
 		array = heapArray;
-		arraySize = 512;
-		arrayF = arrayF;
+		arraySize = 512*8;
+		arrayF = arrayFloat;
 	}
-
-	public boolean insert(int data) {
+	/**
+	 * inserts into the heap
+	 * @param data is the int data
+	 * @param dataF is the float data
+	 * @return if it was successfull
+	 */
+	public boolean insert(int data, float dataF)
+	{
+	    if (arraySize >= 512 * 8)
+	    {
+	        return false;
+	    }
+        arraySize++;
 		array[arraySize] = data;
-		arraySize++;
-		sift();
+		arrayF[arraySize] = dataF;
+		sift(arraySize, 0);
 		return true;
+	}
+	public void sort()
+	{
+	    for (int i = arraySize / 2 -1; i >= 0; i--)
+	    {
+	        sift(arraySize, i);
+	    }
+	    for (int j = arraySize-1; j >= 0; j--)
+	    {
+	        switchPositions(0, j);
+	        sift(j, 0);
+	    }
 	}
 	/**
 	 * sorts the heap
 	 */
-	private void sift()
+	private void sift(int n, int i)
 	{
 	    //go to last element
+	    int big = i;
+	    int l = getLeftChild(i);
+	    int r = getRightChild(i);
+	    
+	    if (l < n && arrayF[l] > arrayF[big] )
+	    {
+	        big = r;
+	    }
+	    if (big != i)
+	    {
+	        switchPositions(big, i);
+	        sift(n, big);
+	    }
 	}
 
 	/**
 	 * gives you the position of the left child
 	 * 
-	 * @param position
-	 *            is root position
+	 * @param position is root position
 	 * @return left position
 	 */
-	private int getLeftChild(int position) {
+	private int getLeftChild(int position)
+	{
 		return position * 2 + 1;
 	}
 
@@ -55,12 +92,11 @@ public class Heap {
 	/**
 	 * switches the positions of array[x] and array[y]
 	 * 
-	 * @param x
-	 *            first position
-	 * @param y
-	 *            2nd position
+	 * @param x first position
+	 * @param y 2nd position
 	 */
-	private void switchPositions(int x, int y) {
+	private void switchPositions(int x, int y)
+	{
 		int temp = array[x];
 		float tempF = arrayF[x];
 		array[x] = array[y];
@@ -68,20 +104,40 @@ public class Heap {
 		arrayF[x] = arrayF[y];
         arrayF[y] = tempF;
 	}
-
-    public Integer deleteMin() {
-        // TODO Auto-generated method stub
-        //swaps the top of the heap with the
-        return null;
+	/**
+	 * deletes the min value and returns it to you
+	 * @return a float array with 0 being the int, 1 being the float
+	 */
+    public float[] deleteMin()
+    {
+        float[] r = {array[0], arrayF[0]};
+        switchPositions(0, arraySize);
+        arraySize--;
+        sift(arraySize, 0);
+        return r;
     }
-
-    public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+    /**
+     * tells you if its empty or not
+     * @return if its empty
+     */
+    public boolean isEmpty()
+    {
+        return array[0] == 0;
     }
-
-    public Integer[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * gives you the int array
+     * @return the int array
+     */
+    public int[] toArray()
+    {
+        return array;
+    }
+    /**
+     * gives you the float array
+     * @return the float array
+     */
+    public float[] toArrayF()
+    {
+        return arrayF;
     }
 }
