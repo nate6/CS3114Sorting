@@ -10,36 +10,24 @@ public class Heap {
 	 * @param heapArray
 	 *            unsorted array
 	 */
-	public Heap(Integer[] heapArray) {
-		//array = heapArray;
+	public Heap(int[] heapArray, float[] arrayF) {
+		array = heapArray;
 		arraySize = 512;
-		//arrayF = arrayFloat;
+		arrayF = arrayF;
 	}
 
 	public boolean insert(int data) {
-		// if this then you need to make heap bigger
-		if (arraySize == array.length) {
-			// increase size of array
-			int[] newArray = new int[array.length * 2];
-			for (int i = 0; i < array.length; i++) {
-				newArray[i] = array[i];
-			}
-			newArray[array.length] = data;
-			array = newArray;
-			sift();
-			arraySize++;
-			return true;
-		} // dont need to will always be 512
-		else {
-			array[arraySize] = data;
-			arraySize++;
-			sift();
-			return true;
-		}
+		array[arraySize] = data;
+		arraySize++;
+		sift();
+		return true;
 	}
-
-	private void sift() {
-
+	/**
+	 * sorts the heap
+	 */
+	private void sift()
+	{
+	    //go to last element
 	}
 
 	/**
@@ -74,12 +62,16 @@ public class Heap {
 	 */
 	private void switchPositions(int x, int y) {
 		int temp = array[x];
+		float tempF = arrayF[x];
 		array[x] = array[y];
 		array[y] = temp;
+		arrayF[x] = arrayF[y];
+        arrayF[y] = tempF;
 	}
 
     public Integer deleteMin() {
         // TODO Auto-generated method stub
+        //swaps the top of the heap with the
         return null;
     }
 
