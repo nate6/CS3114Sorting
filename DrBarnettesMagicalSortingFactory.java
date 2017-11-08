@@ -19,7 +19,7 @@ public class DrBarnettesMagicalSortingFactory {
     public void run() {
         if (id_list != null && id_list.size() > 0) {
             startTimer();
-            replacementSelection(id_list.get(0), 1);
+            replacementSelection(id_list.get(0), key_list.get(0), 1);
             stopTimer();
         }
     }
@@ -40,9 +40,9 @@ public class DrBarnettesMagicalSortingFactory {
         sc.close();
     }
 
-    private Integer[] replacementSelection(Integer[] block, int blockIdx) {
+    private Integer[] replacementSelection(Integer[] ids, Float[] keys, int blockIdx) {
         
-        Heap heap = new Heap(block);
+        Heap heap = new Heap((int[]) ids, (float[]) keys);
         if (id_list.size() == blockIdx) {
             return heap.toArray();
         }
@@ -52,6 +52,7 @@ public class DrBarnettesMagicalSortingFactory {
         
         
         LinkedList<Integer> outBuffer = new LinkedList<Integer>();
+        LinkedList<Float> outKeyBuffer = new LinkedList<Float>();
         int[] list = new int[MAX_RECORDS];
         int idx = 0;
         while (!heap.isEmpty()) {
@@ -67,12 +68,12 @@ public class DrBarnettesMagicalSortingFactory {
                     idx++;
                 }
             }
-            heap = new Heap((Integer[]) outBuffer.toArray());
+            heap = new Heap((int[]) outBuffer.toArray(), (float[]) outKeyBuffer.toArray());
             outBuffer = new LinkedList<Integer>();
         }
 
         return replacementSelection((Integer[]) outBuffer.toArray(),
-                blockIdx + 1);
+                (Float[]) outKeyBuffer.toArray(), blockIdx + 1);
     }
     
     private void startTimer() {
