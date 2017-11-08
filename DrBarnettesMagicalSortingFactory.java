@@ -42,9 +42,9 @@ public class DrBarnettesMagicalSortingFactory {
 
     private Integer[] replacementSelection(Integer[] ids, Float[] keys, int blockIdx) {
         
-        Heap heap = new Heap((int[]) ids, (float[]) keys);
+        Heap heap = new Heap(new int[10], new float[10]);
         if (id_list.size() == blockIdx) {
-            return heap.toArray();
+            //return heap.toArray();
         }
         
         Stack<Integer> records = new Stack<Integer>();
@@ -56,19 +56,21 @@ public class DrBarnettesMagicalSortingFactory {
         int[] list = new int[MAX_RECORDS];
         int idx = 0;
         while (!heap.isEmpty()) {
-            int min = heap.deleteMin();
+            float[] minPack = heap.deleteMin();
+            int min = (int) minPack[0];
             outBuffer.add(min);
             if (records.size() != 0) {
                 int next = records.pop();
                 if (next >= outBuffer.getLast()) {
-                    heap.insert(next);
+                    heap.insert(next, 0.0f);
                 }
                 else {
                     list[idx] = next;
                     idx++;
                 }
             }
-            heap = new Heap((int[]) outBuffer.toArray(), (float[]) outKeyBuffer.toArray());
+            Integer[] k = (Integer[]) outBuffer.toArray();
+            //heap = new Heap(, (float[]) outKeyBuffer.toArray());
             outBuffer = new LinkedList<Integer>();
         }
 
