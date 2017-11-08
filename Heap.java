@@ -1,8 +1,8 @@
 
 public class Heap {
-	int[] array;
-	float[] arrayF;
-	int arraySize;
+	private int[] array;
+	private float[] arrayF;
+	private int arraySize;
 
 	/**
 	 * sets up the heapsorter with a given array (unsorted)
@@ -34,6 +34,9 @@ public class Heap {
 		sift(arraySize, 0);
 		return true;
 	}
+	/**
+	 * 
+	 */
 	public void sort()
 	{
 	    for (int i = arraySize / 2 -1; i >= 0; i--)
@@ -48,6 +51,8 @@ public class Heap {
 	}
 	/**
 	 * sorts the heap
+	 * @param n is the size of the heap
+	 * @param i is the root position
 	 */
 	private void sift(int n, int i)
 	{
@@ -58,8 +63,12 @@ public class Heap {
 	    
 	    if (l < n && arrayF[l] > arrayF[big] )
 	    {
-	        big = r;
+	        big = l;
 	    }
+	    if (r < n && arrayF[r] > arrayF[big] )
+        {
+            big = r;
+        }
 	    if (big != i)
 	    {
 	        switchPositions(big, i);
