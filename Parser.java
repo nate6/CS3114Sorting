@@ -1,3 +1,4 @@
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,6 +49,7 @@ public class Parser {
         {
             e.printStackTrace();
         }
+        
         FileChannel inChannel = inFile.getChannel();
         int length = ((int) new File(fileLocation).length()) / 8;
         bB = ByteBuffer.allocate(length * 8);
@@ -94,5 +96,27 @@ public class Parser {
     public LinkedList<Float[]> getKeys() {
         return key_list;
     }
-
+    /**
+     * reads in a block based on the block number
+     * @param blockNumber is the block number
+     * @return a bytebuffer containing that block
+     * @throws IOException 
+     */
+    public ByteBuffer readBlock(int blockNumber, String fileLocation)
+            throws IOException
+    {
+        FileInputStream inFile = null;
+        try
+        {
+            inFile = new FileInputStream(fileLocation);
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        BufferedInputStream bIS = new BufferedInputStream(inFile);
+        
+        byte[] bytes = new byte[512 * 8 * 8];
+        bIS.read(bytes, blockNumber * 512 * 8 * 8, 512 * 8 * 8);
+        return ByteBuffer.wrap(bytes);
+    }
 }

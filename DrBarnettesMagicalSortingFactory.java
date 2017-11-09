@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,8 +21,9 @@ public class DrBarnettesMagicalSortingFactory {
     /**
      * sets up the class with a specific file
      * @param file is the file being red from
+     * @throws IOException 
      */
-    public DrBarnettesMagicalSortingFactory(String file) {
+    public DrBarnettesMagicalSortingFactory(String file) throws IOException {
         id_list = null;
         this.file = file;
         //parse(file);
@@ -31,8 +33,9 @@ public class DrBarnettesMagicalSortingFactory {
     /**
      * starts running the sorting process and stores
      *  the beginning and end time
+     * @throws IOException 
      */
-    public void run()
+    public void run() throws IOException
     {
         if (id_list != null && id_list.size() > 0)
         {
@@ -69,8 +72,9 @@ public class DrBarnettesMagicalSortingFactory {
      * @param keys are the key values
      * @param blockIdx the index of the block
      * @return an array of ints
+     * @throws IOException 
      */
-    private Integer[] replacementSelection(Integer[] ids, Float[] keys, int blockIdx)
+    private Integer[] replacementSelection(Integer[] ids, Float[] keys, int blockIdx) throws IOException
     {    
         Heap heap = new Heap(new int[512 * 8], new float[512 * 8]);
         if (id_list.size() == blockIdx)
@@ -105,6 +109,10 @@ public class DrBarnettesMagicalSortingFactory {
             Integer[] k = (Integer[]) outBuffer.toArray();
             //heap = new Heap(, (float[]) outKeyBuffer.toArray());
             outBuffer = new LinkedList<Integer>();
+            //this will will make the temp file and have it delete when the
+                //program closes, *write to this for runs
+            File temp = File.createTempFile("runs", ".bin");
+            temp.deleteOnExit();
         }
 
         return replacementSelection((Integer[]) outBuffer.toArray(),
@@ -129,7 +137,7 @@ public class DrBarnettesMagicalSortingFactory {
      */
     private void sortRuns()
     {
-        //pick all runs lets say 4
+        //pick k runs lets say 4
         //int[] runA = new int[length of run A]
         //int[] runB = new int[length of run B]
         //int[] runC = new int[length of run C]
