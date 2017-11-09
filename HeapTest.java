@@ -15,7 +15,7 @@ public class HeapTest extends TestCase
         int[] array = new int[512 * 8];
         float[] arrayF = new float[512 * 8];
         Random rand = new Random();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 512*8; i++)
         {
             array[i] = rand.nextInt();
             arrayF[i] = rand.nextFloat();
