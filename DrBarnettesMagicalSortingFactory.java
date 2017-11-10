@@ -132,32 +132,68 @@ public class DrBarnettesMagicalSortingFactory {
     
     /**
      * sorts the runs after the runs are placed in the file
+     * @throws IOException 
      */
-    private void sortRuns() {
-        //pick k runs lets say 4
-        //int[] runA = new int[length of run A]
-        //int[] runB = new int[length of run B]
-        //int[] runC = new int[length of run C]
-        //int[] runD = new int[length of run D]
-            //also have to do the float ones
-        //make buffer
-        int[] bufferInt = new int[512 * 8];
-        float[] bufferFloat = new float[512 * 8];
-        int bufferPosition = 0;
-        int posA = 0;
-        int posB = 0;
-        int posC = 0;
-        int posD = 0;
-        while(bufferPosition < 512 * 8) {
-        //find the smallest value of each and place it in buffer
-            //if (runA[posA] is biggest)
-                //bufferInt[bufferPosition] = runA[posA];
-                //posA++
-            //...
-            bufferPosition++;
-        }
-        //write buffer to file
+    private void sortRuns(String inFile, String outFile, int[] runPositions
+            , int[] runLengths) throws IOException
+    {
+        Parser p = new Parser(inFile);
         
-    }
+        int numRuns = runPositions.length;
+        if (numRuns == 1)
+        {
+            //make outfile have contents of infile
+            return;
+        }
+        //i'm just going to merge 2 at a time
+        int pos1 = 0;
+        int pos2 = 0;
+        
+        ByteBuffer b1 = p.readRuns(runPositions[0], inFile, runLengths[0]);
+        ByteBuffer b2 = p.readRuns(runPositions[1], inFile, runLengths[0]);
+        //does not account for a run being a different size yet
+        while (pos1 < runLengths[0] && pos2 < runLengths[1])
+        {
+            float f1 = b1.getFloat(pos1 * 2);
+            float f2 = b2.getFloat(pos2 * 2);
+            if (f1 > f2)
+            {
+                //output f2
+                pos2++;
+            }
+            if (f1 < f2)
+            {
+                //output f1
+                pos1++;
+            }
+            if (f1 == f2)
+            {
+                int i1 = b1.getInt(pos1 * 2 - 1);
+                int i2 = b2.getInt(pos2 * 2 - 1);
+                if (i1 > i2)
+                {
+                    //output i2
+                    pos2++;
+                }
+                else
+                {
+                    //output i1
+                    pos1++;
+                }
+            }
+        }
+        int[] newPositions = new int[runPositions.length - 1];
+        int[] newLengths = new int[runLengths.length - 1];
+        newPositions[0] = runPositions[0] + runPositions[1];
+        newLengths[0] = runLengths[0] + runLengths[1];
+        //write buffer to file
+        if (newLengths.length == 1)
+        {
+            //output to outFile
+        }
+        else
+        {
+            sortRuns(inFile, outFile, newPositions, newLengths);
+        }
     }
 }

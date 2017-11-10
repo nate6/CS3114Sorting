@@ -124,4 +124,27 @@ public class Parser {
         bIS.read(bytes, blockNumber * 512 * 8 * 8, 512 * 8 * 8);
         return ByteBuffer.wrap(bytes);
     }
+    /**
+     * reads in a block based on the block number
+     * @param blockPosition is the block position
+     * @return a bytebuffer containing that block
+     * @throws IOException 
+     */
+    public ByteBuffer readRuns(int blockPosition, String fileLocation, int length)
+            throws IOException
+    {
+        FileInputStream inFile = null;
+        try
+        {
+            inFile = new FileInputStream(fileLocation);
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        BufferedInputStream bIS = new BufferedInputStream(inFile);
+        
+        byte[] bytes = new byte[length];
+        bIS.read(bytes, blockPosition, length);
+        return ByteBuffer.wrap(bytes);
+    }
 }
