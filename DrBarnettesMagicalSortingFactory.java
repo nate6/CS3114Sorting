@@ -162,7 +162,6 @@ public class DrBarnettesMagicalSortingFactory {
         }
         //write buffer to file
         
-        
-        
+    }
     }
 }
