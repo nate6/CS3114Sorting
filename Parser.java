@@ -12,8 +12,8 @@ import java.util.Scanner;
 public class Parser {
     public LinkedList<Integer[]> id_list;
     public LinkedList<Float[]> key_list;
-    private int[] ids;
-    private float[] keys;
+    private int[][] ids;
+    private float[][] keys;
     private ByteBuffer bB;
     /**
      * sets up the parser
@@ -39,8 +39,7 @@ public class Parser {
      * @param fileLocation is the location of the file
      * @throws IOException 
      */
-    public Parser(String fileLocation) throws IOException
-    {
+    public Parser(String fileLocation) {
         FileInputStream inFile = null;
         try
         {
@@ -53,23 +52,29 @@ public class Parser {
         FileChannel inChannel = inFile.getChannel();
         int length = ((int) new File(fileLocation).length()) / 8;
         bB = ByteBuffer.allocate(length * 8);
-        ids = new int[length];
-        keys = new float[length];
-        while (inChannel.read(bB) != -1)
-        {
-            ((ByteBuffer) (bB.flip())).asIntBuffer().get(ids);
-            ((ByteBuffer) (bB.flip())).asFloatBuffer().get(keys);
-            bB.clear();
+        ids = new int[length][2];
+        keys = new float[length][2];
+        
+        try {
+            while (inChannel.read(bB) != -1)
+            {
+                ((ByteBuffer) (bB.flip())).asIntBuffer().get(ids[0]);
+                ((ByteBuffer) (bB.flip())).asFloatBuffer().get(keys[0]);
+                bB.clear();
+            }
+            inFile.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        inFile.close();
 
-        id_list.add(Arrays.stream(ids).boxed().toArray( Integer[]::new ));
+        id_list.add(Arrays.stream(ids[0]).boxed().toArray( Integer[]::new ));
         //key_list.add(Arrays.stream(keys).boxed().toArray( Float[]::new ));********where i cant get it
         //can do this but its waaaaaaayyyyy inefficient
         Float[] keyFloat = new Float[keys.length];
         for (int i = 0; i < keys.length; i++)
         {
-            keyFloat[i] = new Float(keys[i]);
+            keyFloat[i] = new Float(keys[i][0]);
         }
         key_list.add(keyFloat);
     }
@@ -77,7 +82,7 @@ public class Parser {
      * gives you the list of ids
      * @return the array of ids
      */
-    public int[] getID()
+    public int[][] getID()
     {
         return ids;
     }
@@ -85,7 +90,7 @@ public class Parser {
      * gives you the array of keys
      * @return the array of keys
      */
-    public float[] getKey()
+    public float[][] getKey()
     {
         return keys;
     }

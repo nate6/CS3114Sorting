@@ -10,62 +10,51 @@ import java.util.Scanner;
 import java.util.Stack;
 
 public class DrBarnettesMagicalSortingFactory {
-    private LinkedList<Integer[]> id_list;
-    private LinkedList<Float[]> key_list;
-    private int[] ids;
-    private float[] keys;
-    private final int MAX_RECORDS = 512;
+    private int[] runI;
+    private float[] runK;
     private long time;
-    private String file;
 
     /**
      * sets up the class with a specific file
      * @param file is the file being red from
      * @throws IOException 
      */
-    public DrBarnettesMagicalSortingFactory(String file) throws IOException {
-        id_list = null;
-        this.file = file;
-        //parse(file);
-        run();
+    public DrBarnettesMagicalSortingFactory(String file) {
+        Parser ps = new Parser(file);
+        parse(ps, file);
+        run(ps);
         System.out.println(file + " " + time);
     }
+    
     /**
      * starts running the sorting process and stores
      *  the beginning and end time
      * @throws IOException 
      */
-    public void run() throws IOException
-    {
-        if (id_list != null && id_list.size() > 0)
-        {
-            startTimer();
-            replacementSelection(id_list.get(0), key_list.get(0), 1);
-            stopTimer();
-        }
+    public void run(Parser ps) {
+        startTimer();
+        replacementSelection(ps.getID()[0], ps.getKey()[0], ps.getID()[1], ps.getKey()[1]);
+        stopTimer();
     }
+    
     /**
      * parses the file
      * @param file is the string form of the file
      * @throws IOException 
      */
-    private void parse(String file) throws IOException
-    {
+    private void parse(Parser ps, String file) {
         Scanner sc = new Scanner(file);
-        Parser ps = new Parser(file);
         ps.parse(sc);
-        ids = ps.getID();
-        keys = ps.getKey();
-        LinkedList<Integer[]> ids = ps.getIDs();
-        LinkedList<Float[]> keys = ps.getKeys();
-        if (ids.size() == 0 || keys.size() == 0) {
+        
+        int[][] ids = ps.getID();
+        float[][] keys = ps.getKey();
+        if (ids.length == 0 || keys.length == 0) {
             System.out.println("No records found in file.");
             System.exit(1);
         }
-        this.id_list = ids;
-        this.key_list = keys;
         sc.close();
     }
+    
     /**
      * runs the replacement selection sort
      * @param ids are the ID values
@@ -74,69 +63,77 @@ public class DrBarnettesMagicalSortingFactory {
      * @return an array of ints
      * @throws IOException 
      */
-    private Integer[] replacementSelection(Integer[] ids, Float[] keys, int blockIdx) throws IOException
-    {    
-        Heap heap = new Heap(new int[512 * 8], new float[512 * 8]);
-        if (id_list.size() == blockIdx)
-        {
-            //return heap.toArray();
+    private void replacementSelection(int[] idsOut, float[] keysOut, int[] idsIn, float[] keysIn) {
+        Heap heap = new Heap(idsOut, keysOut);
+        if (idsIn == null) {
+            runI = heap.toArray();
+            runK = heap.toArrayF();
+            return;
         }
-        Stack<Integer> records = new Stack<Integer>();
-        records.addAll(Arrays.asList(id_list.get(blockIdx)));
         
+        int size = idsOut.length + idsIn.length;
+        int[] outBuffer = new int[size];
+        float[] outBufferF = new float[size];
+        int[] list = new int[size];
+        float[] listF = new float[size];
+        int idx_in = 0;
+        int idx_out = 0;
+        int idx_list = 0;
         
-        LinkedList<Integer> outBuffer = new LinkedList<Integer>();
-        LinkedList<Float> outKeyBuffer = new LinkedList<Float>();
-        int[] list = new int[MAX_RECORDS];
-        int idx = 0;
-        while (!heap.isEmpty())
-        {
+        while (!heap.isEmpty()) {
             float[] minPack = heap.deleteMin();
-            int min = (int) minPack[0];
-            outBuffer.add(min);
-            if (records.size() != 0) {
-                int next = records.pop();
-                if (next >= outBuffer.getLast())
-                {
-                    heap.insert(next, 0.0f);
+            outBuffer[idx_out] = (int) minPack[0];
+            outBufferF[idx_out] = minPack[1];
+            idx_out++;
+            
+            if (idx_in < idsIn.length) {
+                int next = idsIn[idx_in];
+                idx_in++;
+                if (next >= outBuffer[idx_out - 1]) {
+                    heap.insert(next, keysIn[idx_in]);
                 }
-                else
-                {
-                    list[idx] = next;
-                    idx++;
+                else {
+                    list[idx_list] = next;
+                    listF[idx_list] = keysIn[idx_in];
+                    idx_list++;
                 }
             }
-            Integer[] k = (Integer[]) outBuffer.toArray();
-            //heap = new Heap(, (float[]) outKeyBuffer.toArray());
-            outBuffer = new LinkedList<Integer>();
+            // TODO put buffer in a run
+            heap = new Heap(list, listF);
+            outBuffer = new int[size];
+            outBufferF = new float[size];
+            
             //this will will make the temp file and have it delete when the
                 //program closes, *write to this for runs
-            File temp = File.createTempFile("runs", ".bin");
+            File temp = null;
+            try {
+                temp = File.createTempFile("runs", ".bin");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             temp.deleteOnExit();
         }
-
-        return replacementSelection((Integer[]) outBuffer.toArray(),
-                (Float[]) outKeyBuffer.toArray(), blockIdx + 1);
     }
+    
     /**
      * starts the timer
      */
-    private void startTimer()
-    {
+    private void startTimer() {
         time = System.currentTimeMillis();
     }
+    
     /**
      * ends the timer and gives you the time between the run
      */
-    private void stopTimer()
-    {
+    private void stopTimer() {
         time = System.currentTimeMillis() - time;
     }
+    
     /**
      * sorts the runs after the runs are placed in the file
      */
-    private void sortRuns()
-    {
+    private void sortRuns() {
         //pick k runs lets say 4
         //int[] runA = new int[length of run A]
         //int[] runB = new int[length of run B]
@@ -151,8 +148,7 @@ public class DrBarnettesMagicalSortingFactory {
         int posB = 0;
         int posC = 0;
         int posD = 0;
-        while(bufferPosition < 512 * 8)
-        {
+        while(bufferPosition < 512 * 8) {
         //find the smallest value of each and place it in buffer
             //if (runA[posA] is biggest)
                 //bufferInt[bufferPosition] = runA[posA];
