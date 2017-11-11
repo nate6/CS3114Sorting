@@ -1,7 +1,5 @@
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -10,11 +8,9 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.Stack;
 
 public class DrBarnettesMagicalSortingFactory {
     private String file;
-    private Parser ps;
     private int length;
     private long time;
 
@@ -25,8 +21,6 @@ public class DrBarnettesMagicalSortingFactory {
      */
     public DrBarnettesMagicalSortingFactory(String file) {
         this.file = file;
-        ps = new Parser(file);
-        parse();
         run();
         System.out.println(file + " " + time);
     }
@@ -45,88 +39,67 @@ public class DrBarnettesMagicalSortingFactory {
             temp = File.createTempFile("runs", ".bin");
         } catch (IOException e) {
             e.printStackTrace();
-            //TODO exit
         }
         temp.deleteOnExit();
-        Heap heap = heapify(ps.readBlock(0, file));
-        ByteBuffer bBuffer = ps.readBlock(1, file);
-        replacementSelection(heap, bBuffer, 1, "runs.bin");
+        replacementSort("runs.bin");
         stopTimer();
     }
     
     /**
-     * parses the file
-     * @param file is the string form of the file
-     * @throws IOException 
-     */
-    private void parse() {
-        Scanner sc = new Scanner(file);
-        ps.parse(sc);
-        
-        int[][] ids = ps.getID();
-        float[][] keys = ps.getKey();
-        if (ids.length == 0 || keys.length == 0) {
-            System.out.println("No records found in file.");
-            System.exit(1);
-        }
-        sc.close();
-        
-        length = ((int) new File(file).length()) / 8;
-    }
-    
-    /**
      * runs the replacement selection sort
-     * @param ids are the ID values
-     * @param keys are the key values
-     * @param blockIdx the index of the block
-     * @return an array of ints
-     * @throws IOException 
      */
-    private void replacementSort(Heap heap, ByteBuffer bBuffer, int pos, String output) {
+    private void replacementSort(String output) {
+        
+        Heap heap = heapify(Parser.readBlock(0, file));        
         if (length == 512 * 8) {
-            heap.toArray(); //TODO
-            heap.toArrayF();
+            writeHeap(heap, output);
             return;
         }
-        if (!bBuffer.hasRemaining()) {
-            pos++;
-            bBuffer = ps.readBlock(pos, file);
-            if (bBuffer == null) {
-                // TODO 
-            }
-        }
+
+        int blockNum = 1;
+        ByteBuffer bBuffer = Parser.readBlock(blockNum, file);
         
-        int[] runPositions = new int[8];
-        int[] runLengths = new int[8];
-        
+        int[] runPos = new int[8];
+        int[] runLen = new int[8];
         int[] list = new int[512 * 8];
         float[] listF = new float[512 * 8];
-        int idx_in = 0;
         int idx_list = 0;
         
         do {
             while (!heap.isEmpty()) {
                 float[] minPack = heap.deleteMin();
-                ps.writeRecord(output, (int) minPack[0], minPack[1], true);
+                Parser.writeRecord(output, (int) minPack[0], minPack[1], true);
                 
-                int next = idsIn[idx_in];
-                idx_in++;
+                int next = bBuffer.getInt();
                 if (next >= 0) {
-                    heap.insert(next, keysIn[idx_in]);
+                    heap.insert(next, bBuffer.getFloat());
                 }
                 else {
                     list[idx_list] = next;
-                    listF[idx_list] = keysIn[idx_in];
+                    listF[idx_list] = bBuffer.getFloat();
                     idx_list++;
+                }
+
+                if (!bBuffer.hasRemaining()) {
+                    blockNum++;
+                    bBuffer = Parser.readBlock(blockNum, file);
+                    if (blockNum * 512 * 8 > length) {
+                        writeHeap(heap, output);
+                        break;
+                    }
                 }
             }
 
             heap = new Heap(list, listF);
-            outBuffer = new int[size];
-            outBufferF = new float[size];
-        } while (idx_in < size);
+            list = new int[512 * 8];
+            listF = new float[512 * 8];
+        } while (blockNum * 512 * 8 > length);
         
-        sortRuns(inFile, outFile, runPositions, runLengths);
+        try {
+            sortRuns(output, file, runPos, runLen);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     private Heap heapify(ByteBuffer bBuffer) {
@@ -146,6 +119,13 @@ public class DrBarnettesMagicalSortingFactory {
         return heap;
     }
     
+    private void writeHeap(Heap heap, String output) {
+        for (int i = 0; i < heap.toArray().length; i++) {
+            Parser.writeRecord(output, heap.toArray()[i], 
+                    heap.toArrayF()[i], true);
+        }
+    }
+    
     /**
      * starts the timer
      */
@@ -159,7 +139,6 @@ public class DrBarnettesMagicalSortingFactory {
     private void stopTimer() {
         time = System.currentTimeMillis() - time;
     }
-    
     /**
      * sorts the runs after the runs are placed in the file
      * @throws IOException 
@@ -298,5 +277,8 @@ public class DrBarnettesMagicalSortingFactory {
         }
         
     }
+    
+}
+
     
 }
