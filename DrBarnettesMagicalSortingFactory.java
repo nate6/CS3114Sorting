@@ -211,7 +211,7 @@ public class DrBarnettesMagicalSortingFactory {
      */
     public void getStatistics(String statFile) {
         File stFile = new File(statFile);
-        String out = this.file + " " + time;
+        String out = this.file + " " + time + "\n";
         if (stFile.exists()) {
             try {
                 FileWriter fw = new FileWriter(stFile, true);
