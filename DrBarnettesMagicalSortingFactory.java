@@ -6,6 +6,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
+/**
+ * Handles the Replacement Sort and Merge Sort for file.
+ * 
+ * @author Drew Bond <dbond07>
+ *         Nate Axt <nate6>
+ * @version 11.10.2017
+ */
 public class DrBarnettesMagicalSortingFactory {
     private String file;
     private int length;
@@ -13,8 +20,7 @@ public class DrBarnettesMagicalSortingFactory {
 
     /**
      * sets up the class with a specific file
-     * @param file is the file being red from
-     * @throws IOException 
+     * @param file is the file being read from
      */
     public DrBarnettesMagicalSortingFactory(String file) {
         this.file = file;
@@ -25,7 +31,6 @@ public class DrBarnettesMagicalSortingFactory {
     /**
      * starts running the sorting process and stores
      *  the beginning and end time
-     * @throws IOException 
      */
     public void run() {
         startTimer();
@@ -44,8 +49,9 @@ public class DrBarnettesMagicalSortingFactory {
     
     /**
      * runs the replacement selection sort
+     * @param output runs output
      */
-    private void replacementSort(String output) {
+    public void replacementSort(String output) {
         
         Heap heap = heapify(Parser.readBlock(0, file));        
         if (length == 512 * 8) {
@@ -58,14 +64,19 @@ public class DrBarnettesMagicalSortingFactory {
         
         int[] runPos = new int[8];
         int[] runLen = new int[8];
+        int runCount = 0;
+        int runStart = 0;
+        
         int[] list = new int[512 * 8];
         float[] listF = new float[512 * 8];
         int idx_list = 0;
         
         do {
+            int runEnd = 0;
             while (!heap.isEmpty()) {
                 float[] minPack = heap.deleteMin();
                 Parser.writeRecord(output, (int) minPack[0], minPack[1], true);
+                runEnd++;
                 
                 int next = bBuffer.getInt();
                 if (next >= 0) {
@@ -80,12 +91,19 @@ public class DrBarnettesMagicalSortingFactory {
                 if (!bBuffer.hasRemaining()) {
                     blockNum++;
                     bBuffer = Parser.readBlock(blockNum, file);
+                    int[][] runs = incrementRuns(runPos, runLen);
+                    runPos = runs[0];
+                    runLen = runs[1];
                     if (blockNum * 512 * 8 > length) {
                         writeHeap(heap, output);
                         break;
                     }
                 }
             }
+            
+            runPos[runCount] = runStart;
+            runLen[runCount] = runEnd;
+            runCount++;
 
             heap = new Heap(list, listF);
             list = new int[512 * 8];
@@ -99,7 +117,12 @@ public class DrBarnettesMagicalSortingFactory {
         }
     }
     
-    private Heap heapify(ByteBuffer bBuffer) {
+    /**
+     * Sends buffer into heap.
+     * @param bBuffer bytes
+     * @return those bytes in a heap
+     */
+    public Heap heapify(ByteBuffer bBuffer) {
         int[] intHeap = new int[512 * 8];
         float[] floatHeap = new float[512 * 8];
         int i = 0;
@@ -116,11 +139,25 @@ public class DrBarnettesMagicalSortingFactory {
         return heap;
     }
     
-    private void writeHeap(Heap heap, String output) {
+    /**
+     * Writes the heap values to a run.
+     * @param heap of bytes
+     * @param output file name for runs
+     */
+    public void writeHeap(Heap heap, String output) {
         for (int i = 0; i < heap.toArray().length; i++) {
             Parser.writeRecord(output, heap.toArray()[i], 
                     heap.toArrayF()[i], true);
         }
+    }
+    
+    public int[][] incrementRuns(int[] runPos, int[] runLen) {
+        int[][] runs = new int[2][runPos.length * 2];
+        for (int i = 0; i < runPos.length; i++) {
+            runs[0][i] = runPos[i];
+            runs[1][i] = runLen[i];
+        }
+        return runs;
     }
     
     /**
