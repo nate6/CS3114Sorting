@@ -52,5 +52,17 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
             i++;
         }
     }
+    public void testInput()
+    {
+        ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
+        int i = 0;
+        while(bB.hasRemaining())
+        {
+            i++;
+            bB.getInt();
+            bB.getFloat();
+        }
+        System.out.println(i);
+    }
 
 }

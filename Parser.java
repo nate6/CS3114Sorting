@@ -38,7 +38,7 @@ public class Parser {
         byte[] bytes = new byte[512 * 8 * 8];
         try
         {
-            bIS.read(bytes, blockNumber * 512 * 8 * 8, 512 * 8 * 8);
+            bIS.read(bytes, blockNumber * 512 * 8, 512 * 8);
         }
         catch (IOException e)
         {
