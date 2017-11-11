@@ -1,9 +1,12 @@
 import student.TestCase;
 import java.util.Random;
+
 /**
- * tests the 
- * @author Drew Bond dbond07, Nate Axt <>
- *
+ * tests the heap
+ * 
+ * @author Drew Bond <dbond07>
+ *         Nate Axt <nate6>
+ * @version 11.10.2017
  */
 public class HeapTest extends TestCase
 {

@@ -1,4 +1,11 @@
 
+/**
+ * Creates a heap for int float array pairs.
+ * 
+ * @author Drew Bond <dbond07>
+ *         Nate Axt <nate6>
+ * @version 11.10.2017
+ */
 public class Heap {
 	private int[] array;
 	private float[] arrayF;
@@ -9,6 +16,8 @@ public class Heap {
 	 * each array should be holding 8 blocks
 	 * @param heapArray
 	 *            unsorted array
+	 * @param arrayFloat
+	 *            unsorted array paired to heapArray
 	 */
 	public Heap(int[] heapArray, float[] arrayFloat)
 	{
@@ -34,8 +43,9 @@ public class Heap {
 		sift(arraySize, 0);
 		return true;
 	}
+	
 	/**
-	 * 
+	 * Sorts the heap by min
 	 */
 	public void sort()
 	{
@@ -113,6 +123,7 @@ public class Heap {
 		arrayF[x] = arrayF[y];
         arrayF[y] = tempF;
 	}
+	
 	/**
 	 * deletes the min value and returns it to you
 	 * @return a float array with 0 being the int, 1 being the float
@@ -125,6 +136,7 @@ public class Heap {
         sift(arraySize, 0);
         return r;
     }
+    
     /**
      * tells you if its empty or not
      * @return if its empty
@@ -133,6 +145,7 @@ public class Heap {
     {
         return array[0] == 0;
     }
+    
     /**
      * gives you the int array
      * @return the int array
@@ -141,6 +154,7 @@ public class Heap {
     {
         return array;
     }
+    
     /**
      * gives you the float array
      * @return the float array

@@ -24,9 +24,10 @@ public class DrBarnettesMagicalSortingFactory {
      * sets up the class with a specific file
      * @param file is the file being read from
      */
-    public DrBarnettesMagicalSortingFactory(String file) {
+    public DrBarnettesMagicalSortingFactory(String file, String statFile) {
         this.file = file;
         run();
+        getStatistics(statFile);
     }
     
     /**

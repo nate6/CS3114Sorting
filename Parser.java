@@ -7,13 +7,20 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+/**
+ * Parses the bin file and outputs files
+ * 
+ * @author Drew Bond <dbond07>
+ *         Nate Axt <nate6>
+ * @version 11.10.2017
+ */
 public class Parser {
     
     /**
      * reads in a block based on the block number
      * @param blockNumber is the block number
+     * @param fileLocation of the file to read in
      * @return a bytebuffer containing that block
-     * @throws IOException 
      */
     public static ByteBuffer readBlock(int blockNumber, String fileLocation)
     {
@@ -42,8 +49,9 @@ public class Parser {
     /**
      * reads in a block based on the block number
      * @param blockPosition is the block position
+     * @param fileLocation of the file to read in
+     * @param length of byte array
      * @return a bytebuffer containing that block
-     * @throws IOException 
      */
     public static ByteBuffer readRuns(int blockPosition, String fileLocation, int length)
     {
@@ -114,6 +122,11 @@ public class Parser {
         Parser.writeToFile(fileName, b, append);
     }
     
+    /**
+     * Gets the length of the given file
+     * @param file to check
+     * @return byte length of that file
+     */
     public static int getLength(String file) {
         File f = new File(file);
         return (int) f.length() / 8;
