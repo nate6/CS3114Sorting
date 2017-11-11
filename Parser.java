@@ -119,10 +119,32 @@ public class Parser {
     public static void writeRecord(String fileName, int i, float f, 
             boolean append)
     {
+        //ByteBuffer b = ByteBuffer.allocate(8);
+        //b.putInt(i);
+        //b.putFloat(f);
+        //System.out.println(b.getInt(0) + " " + i + " " + f);
+        //Parser.writeToFile(fileName, b, append);
+        //b.clear();
+        FileOutputStream output = null;
+        try
+        {
+            output = new FileOutputStream(fileName, append);
+        }
+        catch (FileNotFoundException e1)
+        {
+            e1.printStackTrace();
+        }
         ByteBuffer b = ByteBuffer.allocate(8);
         b.putInt(i);
         b.putFloat(f);
-        Parser.writeToFile(fileName, b, append);
+        byte[] outBytes = b.array();
+        try
+        {
+            output.write(outBytes);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     /**
