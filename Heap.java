@@ -92,8 +92,8 @@ public class Heap {
             switchPositions(big, i);
             sift(n, big);
         }
-    }
-        if (big != i) {
+        if (big != i)
+        {
             switchPositions(big, i);
             sift(n, big);
         }
@@ -122,17 +122,6 @@ public class Heap {
         return position * 2 + 2;
     }
     /**
-     * gives you the position of the right child
-     * 
-     * @param position
-     *            is root position
-     * @return right position
-     */
-    private int getRightChild(int position) {
-        return position * 2 + 2;
-    }
-
-    /**
      * switches the positions of array[x] and array[y]
      * 
      * @param x
@@ -148,35 +137,7 @@ public class Heap {
         array[y] = temp;
         arrayF[x] = arrayF[y];
         arrayF[y] = tempF;
-    /**
-     * switches the positions of array[x] and array[y]
-     * 
-     * @param x
-     *            first position
-     * @param y
-     *            2nd position
-     */
-    private void switchPositions(int x, int y) {
-        int temp = array[x];
-        float tempF = arrayF[x];
-        array[x] = array[y];
-        array[y] = temp;
-        arrayF[x] = arrayF[y];
-        arrayF[y] = tempF;
     }
-
-    /**
-     * deletes the min value and returns it to you
-     * 
-     * @return a float array with 0 being the int, 1 being the float
-     */
-    public float[] deleteMin()
-    {
-        float[] r = { array[0], arrayF[0] };
-        switchPositions(0, arraySize - 1);
-        arraySize--;
-    }
-
     /**
      * deletes the min value and returns it to you
      * 
