@@ -328,6 +328,7 @@ public class DrBarnettesMagicalSortingFactory {
                 //output f2
                 Parser.writeRecord(tempFile.getName(), b2.getInt(pos2 * 2 - 1),
                         f2, append);
+                append = true;
                 pos2++;
                 cap2++;
             }
@@ -336,6 +337,7 @@ public class DrBarnettesMagicalSortingFactory {
                 //output f1
                 Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
                         f1, append);
+                append = true;
                 pos1++;
                 cap1++;
             }
@@ -347,6 +349,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i2
                     Parser.writeRecord(tempFile.getName(), i2, f2, append);
+                    append = true;
                     pos2++;
                     cap2++;
                 }
@@ -354,11 +357,11 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
+                    append = true;
                     pos1++;
                     pos2++;
                 }
             }
-            append = true;
         }
         if (b1.hasRemaining())
         {
