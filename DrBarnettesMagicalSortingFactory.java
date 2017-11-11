@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Scanner;
 
 public class DrBarnettesMagicalSortingFactory {
     private String file;
@@ -267,7 +268,13 @@ public class DrBarnettesMagicalSortingFactory {
         else
         {
             //place the temp file's values into the inFile
-            RandomAccessFile out = new RandomAccessFile(tempFile, "rw");
+            Scanner scan = new Scanner(tempFile);
+            RandomAccessFile access = new RandomAccessFile(inFile, "rws");
+            while(scan.hasNext())
+            {
+                access.writeInt(scan.nextInt());
+                access.writeFloat(scan.nextFloat());
+            }
             //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }

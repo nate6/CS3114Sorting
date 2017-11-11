@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
@@ -77,6 +78,7 @@ public class Parser {
      * @param b is the bytebuffer needed to be wrote
      * @param append if it will append or nots
      */
+    @SuppressWarnings("resource")
     public static void writeToFile(String fileName, ByteBuffer b, 
             boolean append)
     {
