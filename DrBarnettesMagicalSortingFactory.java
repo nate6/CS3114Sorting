@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -11,8 +12,9 @@ import java.util.Scanner;
 import java.util.Stack;
 
 public class DrBarnettesMagicalSortingFactory {
-    private int[] runI;
-    private float[] runK;
+    private String file;
+    private Parser ps;
+    private int length;
     private long time;
 
     /**
@@ -21,9 +23,10 @@ public class DrBarnettesMagicalSortingFactory {
      * @throws IOException 
      */
     public DrBarnettesMagicalSortingFactory(String file) {
-        Parser ps = new Parser(file);
-        parse(ps, file);
-        run(ps);
+        this.file = file;
+        ps = new Parser(file);
+        parse();
+        run();
         System.out.println(file + " " + time);
     }
     
@@ -32,9 +35,21 @@ public class DrBarnettesMagicalSortingFactory {
      *  the beginning and end time
      * @throws IOException 
      */
-    public void run(Parser ps) {
+    public void run() {
         startTimer();
-        replacementSelection(ps.getID()[0], ps.getKey()[0], ps.getID()[1], ps.getKey()[1]);
+        //this will will make the temp file and have it delete when the
+        //program closes, *write to this for runs
+        File temp = null;
+        try {
+            temp = File.createTempFile("runs", ".bin");
+        } catch (IOException e) {
+            e.printStackTrace();
+            //TODO exit
+        }
+        temp.deleteOnExit();
+        Heap heap = heapify(ps.readBlock(0, file));
+        ByteBuffer bBuffer = ps.readBlock(1, file);
+        replacementSelection(heap, bBuffer, 1, "runs.bin");
         stopTimer();
     }
     
@@ -43,7 +58,7 @@ public class DrBarnettesMagicalSortingFactory {
      * @param file is the string form of the file
      * @throws IOException 
      */
-    private void parse(Parser ps, String file) {
+    private void parse() {
         Scanner sc = new Scanner(file);
         ps.parse(sc);
         
@@ -54,6 +69,8 @@ public class DrBarnettesMagicalSortingFactory {
             System.exit(1);
         }
         sc.close();
+        
+        length = ((int) new File(file).length()) / 8;
     }
     
     /**
@@ -64,33 +81,36 @@ public class DrBarnettesMagicalSortingFactory {
      * @return an array of ints
      * @throws IOException 
      */
-    private void replacementSelection(int[] idsOut, float[] keysOut, int[] idsIn, float[] keysIn) {
-        Heap heap = new Heap(idsOut, keysOut);
-        if (idsIn == null) {
-            runI = heap.toArray();
-            runK = heap.toArrayF();
+    private void replacementSort(Heap heap, ByteBuffer bBuffer, int pos, String output) {
+        if (length == 512 * 8) {
+            heap.toArray(); //TODO
+            heap.toArrayF();
             return;
         }
+        if (!bBuffer.hasRemaining()) {
+            pos++;
+            bBuffer = ps.readBlock(pos, file);
+            if (bBuffer == null) {
+                // TODO 
+            }
+        }
         
-        int size = idsOut.length + idsIn.length;
-        int[] outBuffer = new int[size];
-        float[] outBufferF = new float[size];
-        int[] list = new int[size];
-        float[] listF = new float[size];
+        int[] runPositions = new int[8];
+        int[] runLengths = new int[8];
+        
+        int[] list = new int[512 * 8];
+        float[] listF = new float[512 * 8];
         int idx_in = 0;
-        int idx_out = 0;
         int idx_list = 0;
         
-        while (!heap.isEmpty()) {
-            float[] minPack = heap.deleteMin();
-            outBuffer[idx_out] = (int) minPack[0];
-            outBufferF[idx_out] = minPack[1];
-            idx_out++;
-            
-            if (idx_in < idsIn.length) {
+        do {
+            while (!heap.isEmpty()) {
+                float[] minPack = heap.deleteMin();
+                ps.writeRecord(output, (int) minPack[0], minPack[1], true);
+                
                 int next = idsIn[idx_in];
                 idx_in++;
-                if (next >= outBuffer[idx_out - 1]) {
+                if (next >= 0) {
                     heap.insert(next, keysIn[idx_in]);
                 }
                 else {
@@ -99,22 +119,30 @@ public class DrBarnettesMagicalSortingFactory {
                     idx_list++;
                 }
             }
-            // TODO put buffer in a run
+
             heap = new Heap(list, listF);
             outBuffer = new int[size];
             outBufferF = new float[size];
-            
-            //this will will make the temp file and have it delete when the
-                //program closes, *write to this for runs
-            File temp = null;
-            try {
-                temp = File.createTempFile("runs", ".bin");
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            temp.deleteOnExit();
+        } while (idx_in < size);
+        
+        sortRuns(inFile, outFile, runPositions, runLengths);
+    }
+    
+    private Heap heapify(ByteBuffer bBuffer) {
+        int[] intHeap = new int[512 * 8];
+        float[] floatHeap = new float[512 * 8];
+        int i = 0;
+        
+        while (bBuffer.hasRemaining()) {
+            intHeap[i] = bBuffer.getInt();
+            floatHeap[i] = bBuffer.getFloat();            
+            i++;
         }
+        
+        Heap heap = new Heap(intHeap, floatHeap);
+        heap.sort();
+        bBuffer.clear();
+        return heap;
     }
     
     /**
