@@ -1,6 +1,6 @@
 
 /**
- * Starting class for sorting.
+ * Starting class for sorting
  * 
  * @author Drew Bond <dbond07>
  *         Nate Axt <nate6>

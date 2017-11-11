@@ -41,10 +41,10 @@ public class DrBarnettesMagicalSortingFactory {
         File temp = null;
         try {
             temp = File.createTempFile("runs", ".bin");
+            temp.deleteOnExit();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        temp.deleteOnExit();
         replacementSort("runs.bin");
         stopTimer();
     }
@@ -56,7 +56,7 @@ public class DrBarnettesMagicalSortingFactory {
     public void replacementSort(String output) {
         
         int length = Parser.getLength(file);
-        Heap heap = heapify(Parser.readBlock(0, file));        
+        Heap heap = heapify(Parser.readBlock(0, file));
         if (length == 512 * 8) {
             writeHeap(heap, output);
             return;
