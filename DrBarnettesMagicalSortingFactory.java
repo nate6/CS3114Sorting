@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -134,15 +135,27 @@ public class DrBarnettesMagicalSortingFactory {
      * sorts the runs after the runs are placed in the file
      * @throws IOException 
      */
+    @SuppressWarnings("resource")
     private void sortRuns(String inFile, String outFile, int[] runPositions
             , int[] runLengths) throws IOException
     {
-        Parser p = new Parser(inFile);
-        
+        File tempFile = null;
+        try
+        {
+            tempFile = File.createTempFile("runs", ".bin");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        tempFile.deleteOnExit();
         int numRuns = runPositions.length;
         if (numRuns == 1)
         {
             //make outfile have contents of infile
+            FileChannel in = new FileInputStream(inFile).getChannel();
+            FileChannel out = new FileInputStream(outFile).getChannel();
+            out.transferFrom(in, 0, in.size());
             return;
         }
         //i'm just going to merge 2 at a time
@@ -156,19 +169,19 @@ public class DrBarnettesMagicalSortingFactory {
             //the 512 * 8 records are read in
         if (runLengths[0] < 512 * 8)
         {
-            b1 = p.readRuns(runPositions[0], inFile, runLengths[0]);
+            b1 = Parser.readRuns(runPositions[0], inFile, runLengths[0]);
         }
         else
         {
-            b1 = p.readRuns(runPositions[0], inFile, 512 * 8 * 8);
+            b1 = Parser.readRuns(runPositions[0], inFile, 512 * 8 * 8);
         }
         if (runLengths[1] < 512 * 8)
         {
-            b2 = p.readRuns(runPositions[1], inFile, runLengths[1]);
+            b2 = Parser.readRuns(runPositions[1], inFile, runLengths[1]);
         }
         else
         {
-            b2 = p.readRuns(runPositions[1], inFile, 512 * 8 * 8);
+            b2 = Parser.readRuns(runPositions[1], inFile, 512 * 8 * 8);
         }
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
@@ -177,11 +190,11 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 if (runLengths[0] - cap1 < 512 * 8)
                 {
-                    b1 = p.readRuns(cap1, inFile, runLengths[0] - cap1);
+                    b1 = Parser.readRuns(cap1, inFile, runLengths[0] - cap1);
                 }
                 else
                 {
-                    b1 = p.readRuns(cap1, inFile, 512 * 8 * 8);
+                    b1 = Parser.readRuns(cap1, inFile, 512 * 8 * 8);
                 }
                 pos1 = 0;
             }
@@ -189,11 +202,11 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 if (runLengths[1] - cap2 < 512 * 8)
                 {
-                    b2 = p.readRuns(cap2, inFile, runLengths[0] - cap2);
+                    b2 = Parser.readRuns(cap2, inFile, runLengths[0] - cap2);
                 }
                 else
                 {
-                    b2 = p.readRuns(cap2, inFile, 512 * 8 * 8);
+                    b2 = Parser.readRuns(cap2, inFile, 512 * 8 * 8);
                 }
                 pos2 = 0;
             }
@@ -202,12 +215,16 @@ public class DrBarnettesMagicalSortingFactory {
             if (f1 > f2)
             {
                 //output f2
+                Parser.writeRecord(tempFile.getName(), b2.getInt(pos2 * 2 - 1),
+                        f2, true);
                 pos2++;
                 cap2++;
             }
             if (f1 < f2)
             {
                 //output f1
+                Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
+                        f1, true);
                 pos1++;
                 cap1++;
             }
@@ -218,12 +235,14 @@ public class DrBarnettesMagicalSortingFactory {
                 if (i1 > i2)
                 {
                     //output i2
+                    Parser.writeRecord(tempFile.getName(), i2, f2, true);
                     pos2++;
                     cap2++;
                 }
                 else
                 {
                     //output i1
+                    Parser.writeRecord(tempFile.getName(), i1, f1, true);
                     pos1++;
                     pos2++;
                 }
@@ -237,9 +256,14 @@ public class DrBarnettesMagicalSortingFactory {
         if (newLengths.length == 1)
         {
             //output to outFile
+            FileChannel in = new FileInputStream(tempFile).getChannel();
+            FileChannel out = new FileInputStream(outFile).getChannel();
+            out.transferFrom(in, 0, in.size());
         }
         else
         {
+            //place the temp file's values into the inFile
+            
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
         
