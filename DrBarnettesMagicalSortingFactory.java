@@ -1,6 +1,10 @@
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class DrBarnettesMagicalSortingFactory {
@@ -134,70 +138,5 @@ public class DrBarnettesMagicalSortingFactory {
         time = System.currentTimeMillis() - time;
     }
     
-    /**
-     * sorts the runs after the runs are placed in the file
-     * @throws IOException 
-     */
-    private void sortRuns(String inFile, String outFile, int[] runPositions
-            , int[] runLengths) throws IOException
-    {
-        Parser p = new Parser(inFile);
-        
-        int numRuns = runPositions.length;
-        if (numRuns == 1)
-        {
-            //make outfile have contents of infile
-            return;
-        }
-        //i'm just going to merge 2 at a time
-        int pos1 = 0;
-        int pos2 = 0;
-        
-        ByteBuffer b1 = p.readRuns(runPositions[0], inFile, runLengths[0]);
-        ByteBuffer b2 = p.readRuns(runPositions[1], inFile, runLengths[0]);
-        //does not account for a run being a different size yet
-        while (pos1 < runLengths[0] && pos2 < runLengths[1])
-        {
-            float f1 = b1.getFloat(pos1 * 2);
-            float f2 = b2.getFloat(pos2 * 2);
-            if (f1 > f2)
-            {
-                //output f2
-                pos2++;
-            }
-            if (f1 < f2)
-            {
-                //output f1
-                pos1++;
-            }
-            if (f1 == f2)
-            {
-                int i1 = b1.getInt(pos1 * 2 - 1);
-                int i2 = b2.getInt(pos2 * 2 - 1);
-                if (i1 > i2)
-                {
-                    //output i2
-                    pos2++;
-                }
-                else
-                {
-                    //output i1
-                    pos1++;
-                }
-            }
-        }
-        int[] newPositions = new int[runPositions.length - 1];
-        int[] newLengths = new int[runLengths.length - 1];
-        newPositions[0] = runPositions[0] + runPositions[1];
-        newLengths[0] = runLengths[0] + runLengths[1];
-        //write buffer to file
-        if (newLengths.length == 1)
-        {
-            //output to outFile
-        }
-        else
-        {
-            sortRuns(inFile, outFile, newPositions, newLengths);
-        }
-    }
+    
 }
