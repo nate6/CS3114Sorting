@@ -262,7 +262,7 @@ public class DrBarnettesMagicalSortingFactory {
         {
             //make outfile have contents of infile
             FileInputStream fin = new FileInputStream(inFile);
-            FileInputStream fout = new FileInputStream(outFile);
+            RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
             FileChannel in = fin.getChannel();
             FileChannel out = fout.getChannel();
             out.transferFrom(in, 0, in.size());
@@ -360,6 +360,18 @@ public class DrBarnettesMagicalSortingFactory {
             }
             append = true;
         }
+        if (b1.hasRemaining())
+        {
+            //need to output the rest of them
+            Parser.writeRecord(tempFile.getName(), b1.getInt(), b1.getFloat(), true);
+            pos1++;
+        }
+        while (b2.hasRemaining())
+        {
+            //need to output the rest of them
+            Parser.writeRecord(tempFile.getName(), b2.getInt(), b2.getFloat(), true);
+            pos2++;
+        }
         int[] newPositions = new int[runPositions.length - 1];
         int[] newLengths = new int[runLengths.length - 1];
         newPositions[0] = runPositions[0] + runPositions[1];
@@ -368,8 +380,8 @@ public class DrBarnettesMagicalSortingFactory {
         if (newLengths.length == 1)
         {
             //output to outFile
+            RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
             FileInputStream fin = new FileInputStream(tempFile);
-            FileInputStream fout = new FileInputStream(outFile);
             FileChannel in = fin.getChannel();
             FileChannel out = fout.getChannel();
             out.transferFrom(in, 0, in.size());
