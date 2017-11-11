@@ -1,19 +1,14 @@
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Scanner;
 
 public class Parser {
+    
     /**
      * reads in a block based on the block number
      * @param blockNumber is the block number
@@ -43,6 +38,7 @@ public class Parser {
         }
         return ByteBuffer.wrap(bytes);
     }
+    
     /**
      * reads in a block based on the block number
      * @param blockPosition is the block position
@@ -72,13 +68,13 @@ public class Parser {
         }
         return ByteBuffer.wrap(bytes);
     }
+    
     /**
      * writes a bytebuffer to a given file
      * @param fileName is the name of the file
      * @param b is the bytebuffer needed to be wrote
      * @param append if it will append or nots
      */
-    @SuppressWarnings("resource")
     public static void writeToFile(String fileName, ByteBuffer b, 
             boolean append)
     {
@@ -86,8 +82,10 @@ public class Parser {
         FileChannel wChannel = null;
         try
         {
-            wChannel = new FileOutputStream(file, append).getChannel();
+            FileOutputStream fstream = new FileOutputStream(file, append);
+            wChannel = fstream.getChannel();
             wChannel.write(b);
+            fstream.close();
             wChannel.close();
         }
         catch (FileNotFoundException e)
@@ -99,6 +97,7 @@ public class Parser {
             e.printStackTrace();
         }
     }
+    
     /**
      * outputs a record to a given file
      * @param fileName is the given file
@@ -113,5 +112,10 @@ public class Parser {
         b.putInt(i);
         b.putFloat(f);
         Parser.writeToFile(fileName, b, append);
+    }
+    
+    public static int getLength(String file) {
+        File f = new File(file);
+        return (int) f.length() / 8;
     }
 }
