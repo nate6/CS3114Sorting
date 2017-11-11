@@ -16,12 +16,18 @@ public class heapsortTest extends TestCase
     {
         String[] args = {"8Blocks.bin", "stat.txt"};
         heapsort.main(args);
-        ByteBuffer b = Parser.readBlock(0, "8Blocks.bin");
-        while (b.hasRemaining())
-        {
-            b.getInt();
-            assertNotNull(b.getFloat());
-        }
+        int k = 0;
+        //for (int i = 0; i < 1; i++) {
+            System.out.println("/---------------/: " + k);
+            ByteBuffer b = Parser.readBlock(k, "8Blocks.bin");
+            while (b.hasRemaining())
+            {
+                System.out.println(b.getInt() + " " + b.getFloat());
+                //b.getInt();
+                //assertNotNull(b.getFloat());
+            }
+            //k++;
+        //}
         
     }
 
