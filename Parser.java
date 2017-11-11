@@ -28,7 +28,8 @@ public class Parser {
         try
         {
             inFile = new FileInputStream(fileLocation);
-        } catch (FileNotFoundException e)
+        } 
+        catch (FileNotFoundException e)
         {
             e.printStackTrace();
         }
@@ -53,13 +54,15 @@ public class Parser {
      * @param length of byte array
      * @return a bytebuffer containing that block
      */
-    public static ByteBuffer readRuns(int blockPosition, String fileLocation, int length)
+    public static ByteBuffer readRuns(int blockPosition, String fileLocation, 
+            int length)
     {
         FileInputStream inFile = null;
         try
         {
             inFile = new FileInputStream(fileLocation);
-        } catch (FileNotFoundException e)
+        } 
+        catch (FileNotFoundException e)
         {
             e.printStackTrace();
         }
