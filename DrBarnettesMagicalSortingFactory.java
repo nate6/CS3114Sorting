@@ -163,9 +163,11 @@ public class DrBarnettesMagicalSortingFactory {
      * @param output file name for runs
      */
     public void writeHeap(Heap heap, String output) {
+        int[] arrayI = heap.toArray();
+        float[] arrayF = heap.toArrayF();
         for (int i = 0; i < heap.toArray().length; i++) {
-            Parser.writeRecord(output, heap.toArray()[i], 
-                    heap.toArrayF()[i], true);
+            Parser.writeRecord(output, arrayI[i], 
+                    arrayF[i], true);
         }
     }
     
