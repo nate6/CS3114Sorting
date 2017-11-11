@@ -93,6 +93,11 @@ public class Heap {
             sift(n, big);
         }
     }
+        if (big != i) {
+            switchPositions(big, i);
+            sift(n, big);
+        }
+    }
 
     /**
      * gives you the position of the left child
@@ -101,8 +106,7 @@ public class Heap {
      *            is root position
      * @return left position
      */
-    private int getLeftChild(int position)
-    {
+    private int getLeftChild(int position) {
         return position * 2 + 1;
     }
 
@@ -115,6 +119,16 @@ public class Heap {
      */
     private int getRightChild(int position)
     {
+        return position * 2 + 2;
+    }
+    /**
+     * gives you the position of the right child
+     * 
+     * @param position
+     *            is root position
+     * @return right position
+     */
+    private int getRightChild(int position) {
         return position * 2 + 2;
     }
 
@@ -134,6 +148,21 @@ public class Heap {
         array[y] = temp;
         arrayF[x] = arrayF[y];
         arrayF[y] = tempF;
+    /**
+     * switches the positions of array[x] and array[y]
+     * 
+     * @param x
+     *            first position
+     * @param y
+     *            2nd position
+     */
+    private void switchPositions(int x, int y) {
+        int temp = array[x];
+        float tempF = arrayF[x];
+        array[x] = array[y];
+        array[y] = temp;
+        arrayF[x] = arrayF[y];
+        arrayF[y] = tempF;
     }
 
     /**
@@ -146,6 +175,17 @@ public class Heap {
         float[] r = { array[0], arrayF[0] };
         switchPositions(0, arraySize - 1);
         arraySize--;
+    }
+
+    /**
+     * deletes the min value and returns it to you
+     * 
+     * @return a float array with 0 being the int, 1 being the float
+     */
+    public float[] deleteMin() {
+        float[] r = { array[0], arrayF[0] };
+        switchPositions(0, arraySize);
+        arraySize--;
         sift(arraySize, 0);
         return r;
     }
@@ -155,8 +195,7 @@ public class Heap {
      * 
      * @return if its empty
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return array[0] == 0;
     }
 
@@ -165,8 +204,7 @@ public class Heap {
      * 
      * @return the int array
      */
-    public int[] toArray()
-    {
+    public int[] toArray() {
         return array;
     }
 
@@ -175,8 +213,7 @@ public class Heap {
      * 
      * @return the float array
      */
-    public float[] toArrayF()
-    {
+    public float[] toArrayF() {
         return arrayF;
     }
 }

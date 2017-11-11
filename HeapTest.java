@@ -18,7 +18,7 @@ public class HeapTest extends TestCase
         int[] array = new int[512 * 8];
         float[] arrayF = new float[512 * 8];
         Random rand = new Random();
-        for (int i = 0; i < 512*8; i++)
+        for (int i = 0; i < 512 * 8; i++)
         {
             array[i] = rand.nextInt();
             arrayF[i] = rand.nextFloat();
@@ -30,7 +30,7 @@ public class HeapTest extends TestCase
         assertNotNull(sortedIds[0]);
         for (int i = 0; i < 512 * 8 - 1; i++)
         {
-            assertTrue(sorted[i] <= sorted[i+1]);
+            assertTrue(sorted[i] <= sorted[i + 1]);
         }
         assertFalse(h.isEmpty());
         h.deleteMin();
