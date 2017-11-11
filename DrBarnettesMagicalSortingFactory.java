@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
@@ -164,13 +165,13 @@ public class DrBarnettesMagicalSortingFactory {
      * @throws IOException 
      */
     @SuppressWarnings("resource")
-    private void sortRuns(String inFile, String outFile, int[] runPositions
+    public void sortRuns(String inFile, String outFile, int[] runPositions
             , int[] runLengths) throws IOException
     {
         File tempFile = null;
         try
         {
-            tempFile = File.createTempFile("runs", ".bin");
+            tempFile = File.createTempFile("temp", ".bin");
         }
         catch (IOException e)
         {
@@ -291,7 +292,8 @@ public class DrBarnettesMagicalSortingFactory {
         else
         {
             //place the temp file's values into the inFile
-            
+            RandomAccessFile out = new RandomAccessFile(tempFile, "rw");
+            //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
         
