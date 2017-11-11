@@ -25,8 +25,8 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
         }
         //so its sorting correctly then
         //tests writing a buffer to the file
-        b.writeHeap(h, "out.bin", false);
-        bB = Parser.readBlock(0, "out.bin");
+        b.writeHeap(h, "test.bin", false);
+        bB = Parser.readBlock(0, "test.bin");
         while(bB.hasRemaining())
         {
             assertNotNull(bB.getInt());
@@ -51,13 +51,6 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
             bB.getFloat();
             i++;
         }
-        ByteBuffer bB2 = Parser.readRuns(0, "8Blocks.bin", 
-                Parser.getLength("8Blocks.bin"));
-        while (bB2.hasRemaining())
-        {
-            assertNotNull(bB2.getInt());
-        }
-        
     }
 
 }

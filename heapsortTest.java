@@ -20,7 +20,7 @@ public class heapsortTest extends TestCase
         while (b.hasRemaining())
         {
             b.getInt();
-            System.out.println(b.getFloat());
+            assertNotNull(b.getFloat());
         }
         
     }
