@@ -1,7 +1,10 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -108,7 +111,6 @@ public class Parser {
      * @throws IOException 
      */
     public ByteBuffer readBlock(int blockNumber, String fileLocation)
-            throws IOException
     {
         FileInputStream inFile = null;
         try
@@ -121,7 +123,14 @@ public class Parser {
         BufferedInputStream bIS = new BufferedInputStream(inFile);
         
         byte[] bytes = new byte[512 * 8 * 8];
-        bIS.read(bytes, blockNumber * 512 * 8 * 8, 512 * 8 * 8);
+        try
+        {
+            bIS.read(bytes, blockNumber * 512 * 8 * 8, 512 * 8 * 8);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         return ByteBuffer.wrap(bytes);
     }
     /**
@@ -131,7 +140,6 @@ public class Parser {
      * @throws IOException 
      */
     public ByteBuffer readRuns(int blockPosition, String fileLocation, int length)
-            throws IOException
     {
         FileInputStream inFile = null;
         try
@@ -144,7 +152,55 @@ public class Parser {
         BufferedInputStream bIS = new BufferedInputStream(inFile);
         
         byte[] bytes = new byte[length];
-        bIS.read(bytes, blockPosition, length);
+        try
+        {
+            bIS.read(bytes, blockPosition, length);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         return ByteBuffer.wrap(bytes);
+    }
+    /**
+     * writes a bytebuffer to a given file
+     * @param fileName is the name of the file
+     * @param b is the bytebuffer needed to be wrote
+     * @param append if it will append or nots
+     */
+    public static void writeToFile(String fileName, ByteBuffer b, 
+            boolean append)
+    {
+        File file = new File(fileName);
+        FileChannel wChannel = null;
+        try
+        {
+            wChannel = new FileOutputStream(file, append).getChannel();
+            wChannel.write(b);
+            wChannel.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * outputs a record to a given file
+     * @param fileName is the given file
+     * @param i is the id value
+     * @param f is the key value
+     * @param append is if it is appending or not
+     */
+    public static void writeRecord(String fileName, int i, float f, 
+            boolean append)
+    {
+        ByteBuffer b = ByteBuffer.allocate(8);
+        b.putInt(i);
+        b.putFloat(f);
+        Parser.writeToFile(fileName, b, append);
     }
 }

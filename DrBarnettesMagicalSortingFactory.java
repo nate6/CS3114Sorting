@@ -176,23 +176,68 @@ public class DrBarnettesMagicalSortingFactory {
         //i'm just going to merge 2 at a time
         int pos1 = 0;
         int pos2 = 0;
-        
-        ByteBuffer b1 = p.readRuns(runPositions[0], inFile, runLengths[0]);
-        ByteBuffer b2 = p.readRuns(runPositions[1], inFile, runLengths[0]);
-        //does not account for a run being a different size yet
+        int cap1 = 0;
+        int cap2 = 0;
+        ByteBuffer b1;
+        ByteBuffer b2;
+        //reads in the runs, if they are larger than an 8block then only
+            //the 512 * 8 records are read in
+        if (runLengths[0] < 512 * 8)
+        {
+            b1 = p.readRuns(runPositions[0], inFile, runLengths[0]);
+        }
+        else
+        {
+            b1 = p.readRuns(runPositions[0], inFile, 512 * 8 * 8);
+        }
+        if (runLengths[1] < 512 * 8)
+        {
+            b2 = p.readRuns(runPositions[1], inFile, runLengths[1]);
+        }
+        else
+        {
+            b2 = p.readRuns(runPositions[1], inFile, 512 * 8 * 8);
+        }
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
+            //this is for if it hits the end of the block
+            if (pos1 == 512 * 8)
+            {
+                if (runLengths[0] - cap1 < 512 * 8)
+                {
+                    b1 = p.readRuns(cap1, inFile, runLengths[0] - cap1);
+                }
+                else
+                {
+                    b1 = p.readRuns(cap1, inFile, 512 * 8 * 8);
+                }
+                pos1 = 0;
+            }
+            if (pos2 == 512 * 8)
+            {
+                if (runLengths[1] - cap2 < 512 * 8)
+                {
+                    b2 = p.readRuns(cap2, inFile, runLengths[0] - cap2);
+                }
+                else
+                {
+                    b2 = p.readRuns(cap2, inFile, 512 * 8 * 8);
+                }
+                pos2 = 0;
+            }
             float f1 = b1.getFloat(pos1 * 2);
             float f2 = b2.getFloat(pos2 * 2);
             if (f1 > f2)
             {
                 //output f2
                 pos2++;
+                cap2++;
             }
             if (f1 < f2)
             {
                 //output f1
                 pos1++;
+                cap1++;
             }
             if (f1 == f2)
             {
@@ -202,11 +247,13 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i2
                     pos2++;
+                    cap2++;
                 }
                 else
                 {
                     //output i1
                     pos1++;
+                    pos2++;
                 }
             }
         }
@@ -223,5 +270,7 @@ public class DrBarnettesMagicalSortingFactory {
         {
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
+        
     }
+    
 }
