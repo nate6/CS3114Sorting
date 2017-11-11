@@ -49,7 +49,6 @@ public class DrBarnettesMagicalSortingFactory {
         replacementSort("runs.bin");
         stopTimer();
     }
-    
     /**
      * runs the replacement selection sort
      * @param output runs output
@@ -58,8 +57,9 @@ public class DrBarnettesMagicalSortingFactory {
         
         int length = Parser.getLength(file);
         Heap heap = heapify(Parser.readBlock(0, file));
+        Boolean append = false;
         if (length == 512 * 8) {
-            writeHeap(heap, output);
+            writeHeap(heap, file, append);
             return;
         }
 
@@ -84,7 +84,7 @@ public class DrBarnettesMagicalSortingFactory {
                 float nextF = bBuffer.getFloat();
                 if (nextF >= minPack[1]) {
                     if (nextF == minPack[1] && next < (int) minPack[0]) {
-                        Parser.writeRecord(output, next, nextF, true);
+                        Parser.writeRecord(output, next, nextF, append);
                         runEnd++;
                     }
                     else {
@@ -97,7 +97,7 @@ public class DrBarnettesMagicalSortingFactory {
                     idxList++;
                 }
 
-                Parser.writeRecord(output, (int) minPack[0], minPack[1], true);
+                Parser.writeRecord(output, (int) minPack[0], minPack[1], append);
                 runEnd++;
 
                 if (!bBuffer.hasRemaining()) {
@@ -108,10 +108,11 @@ public class DrBarnettesMagicalSortingFactory {
                     runPos = runs[0];
                     runLen = runs[1];
                     if (blockNum * 512 * 8 > length) {
-                        writeHeap(heap, output);
+                        writeHeap(heap, output, append);
                         break;
                     }
                 }
+                append = true;
             }
             
             runPos[runCount] = runStart;
@@ -125,7 +126,7 @@ public class DrBarnettesMagicalSortingFactory {
             listF = new float[512 * 8];
         } while (blockNum * 512 * 8 > length);
         
-        writeHeap(heap, output);
+        writeHeap(heap, output, append);
         
         try {
             sortRuns(output, file, runPos, runLen);
@@ -162,15 +163,17 @@ public class DrBarnettesMagicalSortingFactory {
      * @param heap of bytes
      * @param output file name for runs
      */
-    public void writeHeap(Heap heap, String output) {
+    public void writeHeap(Heap heap, String output, Boolean append) {
         int[] arrayI = heap.toArray();
         float[] arrayF = heap.toArrayF();
-        for (int i = 0; i < heap.toArray().length; i++) {
+        Parser.writeRecord(output, arrayI[0], arrayF[0], append);
+        append = true;
+        for (int i = 1; i < heap.toArray().length; i++)
+        {
             Parser.writeRecord(output, arrayI[i], 
-                    arrayF[i], true);
+                    arrayF[i], append);
         }
     }
-    
     /**
      * Resizes runs arrays.
      * @param runPos run positions array
@@ -178,7 +181,8 @@ public class DrBarnettesMagicalSortingFactory {
      * @return runPos and runLen with new sizes, filled, 
      *         as a int[0][] and int[1][]
      */
-    public int[][] incrementRuns(int[] runPos, int[] runLen) {
+    public int[][] incrementRuns(int[] runPos, int[] runLen)
+    {
         int[][] runs = new int[2][runPos.length + 8];
         for (int i = 0; i < runPos.length; i++) {
             runs[0][i] = runPos[i];
@@ -240,17 +244,22 @@ public class DrBarnettesMagicalSortingFactory {
      * @throws IOException 
      */
     public void sortRuns(String inFile, String outFile, int[] runPositions
-            , int[] runLengths) throws IOException {
+            , int[] runLengths) throws IOException
+    {
         File tempFile = null;
-        try {
+        try
+        {
             tempFile = File.createTempFile("temp", ".bin");
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
         tempFile.deleteOnExit();
         int numRuns = runPositions.length;
-        if (numRuns == 1) {
+        Boolean append = false;
+        if (numRuns == 1)
+        {
             //make outfile have contents of infile
             FileInputStream fin = new FileInputStream(inFile);
             FileInputStream fout = new FileInputStream(outFile);
@@ -270,77 +279,94 @@ public class DrBarnettesMagicalSortingFactory {
         ByteBuffer b2;
         //reads in the runs, if they are larger than an 8block then only
             //the 512 * 8 records are read in
-        if (runLengths[0] < 512 * 8) {
+        if (runLengths[0] < 512 * 8)
+        {
             b1 = Parser.readRuns(runPositions[0], inFile, runLengths[0]);
         }
-        else {
+        else
+        {
             b1 = Parser.readRuns(runPositions[0], inFile, 512 * 8 * 8);
         }
-        if (runLengths[1] < 512 * 8) {
+        if (runLengths[1] < 512 * 8)
+        {
             b2 = Parser.readRuns(runPositions[1], inFile, runLengths[1]);
         }
-        else {
+        else
+        {
             b2 = Parser.readRuns(runPositions[1], inFile, 512 * 8 * 8);
         }
-        while (pos1 < runLengths[0] && pos2 < runLengths[1]) {
+        while (pos1 < runLengths[0] && pos2 < runLengths[1])
+        {
             //this is for if it hits the end of the block
             if (pos1 == 512 * 8) {
-                if (runLengths[0] - cap1 < 512 * 8) {
+                if (runLengths[0] - cap1 < 512 * 8)
+                {
                     b1 = Parser.readRuns(cap1, inFile, runLengths[0] - cap1);
                 }
-                else {
+                else
+                {
                     b1 = Parser.readRuns(cap1, inFile, 512 * 8 * 8);
                 }
                 pos1 = 0;
             }
-            if (pos2 == 512 * 8) {
-                if (runLengths[1] - cap2 < 512 * 8) {
+            if (pos2 == 512 * 8)
+            {
+                if (runLengths[1] - cap2 < 512 * 8)
+                {
                     b2 = Parser.readRuns(cap2, inFile, runLengths[0] - cap2);
                 }
-                else {
+                else
+                {
                     b2 = Parser.readRuns(cap2, inFile, 512 * 8 * 8);
                 }
                 pos2 = 0;
             }
             float f1 = b1.getFloat(pos1 * 2);
             float f2 = b2.getFloat(pos2 * 2);
-            if (f1 > f2) {
+            if (f1 > f2)
+            {
                 //output f2
                 Parser.writeRecord(tempFile.getName(), b2.getInt(pos2 * 2 - 1),
-                        f2, true);
+                        f2, append);
                 pos2++;
                 cap2++;
             }
-            if (f1 < f2) {
+            if (f1 < f2)
+            {
                 //output f1
                 Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
-                        f1, true);
+                        f1, append);
                 pos1++;
                 cap1++;
             }
-            if (f1 == f2) {
+            if (f1 == f2)
+            {
                 int i1 = b1.getInt(pos1 * 2 - 1);
                 int i2 = b2.getInt(pos2 * 2 - 1);
-                if (i1 > i2) {
+                if (i1 > i2)
+                {
                     //output i2
-                    Parser.writeRecord(tempFile.getName(), i2, f2, true);
+                    Parser.writeRecord(tempFile.getName(), i2, f2, append);
                     pos2++;
                     cap2++;
                 }
-                else {
+                else
+                {
                     //output i1
-                    Parser.writeRecord(tempFile.getName(), i1, f1, true);
+                    Parser.writeRecord(tempFile.getName(), i1, f1, append);
                     pos1++;
                     pos2++;
                 }
             }
+            append = true;
         }
         int[] newPositions = new int[runPositions.length - 1];
         int[] newLengths = new int[runLengths.length - 1];
         newPositions[0] = runPositions[0] + runPositions[1];
         newLengths[0] = runLengths[0] + runLengths[1];
         //write buffer to file
-        if (newLengths.length == 1) {
+        if (newLengths.length == 1)
+        {
             //output to outFile
             FileInputStream fin = new FileInputStream(tempFile);
             FileInputStream fout = new FileInputStream(outFile);
@@ -350,11 +376,13 @@ public class DrBarnettesMagicalSortingFactory {
             fin.close();
             fout.close();
         }
-        else {
+        else
+        {
             //place the temp file's values into the inFile
             Scanner scan = new Scanner(tempFile);
             RandomAccessFile access = new RandomAccessFile(inFile, "rws");
-            while (scan.hasNext()) {
+            while (scan.hasNext())
+            {
                 access.writeInt(scan.nextInt());
                 access.writeFloat(scan.nextFloat());
             }
