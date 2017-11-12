@@ -28,6 +28,7 @@ public class DrBarnettesMagicalSortingFactory {
     public DrBarnettesMagicalSortingFactory(String file, String statFile) {
         this.file = file;
         run();
+        Parser.closeBIS();
         getStatistics(statFile);
     }
     
@@ -132,6 +133,7 @@ public class DrBarnettesMagicalSortingFactory {
         
         bBuffer.clear();
         
+        Parser.closeBIS();
         Parser.setBIS(output);
         try {
             sortRuns(output, file, runPos, runLen);
@@ -270,6 +272,8 @@ public class DrBarnettesMagicalSortingFactory {
             out.transferFrom(in, 0, in.size());
             fin.close();
             fout.close();
+            in.close();
+            out.close();
             return;
         }
         
@@ -383,6 +387,8 @@ public class DrBarnettesMagicalSortingFactory {
             out.transferFrom(in, 0, in.size());
             fin.close();
             fout.close();
+            in.close();
+            out.close();
         }
         else {
             //place the temp file's values into the inFile

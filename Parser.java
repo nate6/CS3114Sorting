@@ -32,7 +32,20 @@ public class Parser {
             e.printStackTrace();
         }
         bIS = new BufferedInputStream(inFile);
-        inFile.close();
+    }
+    
+    /**
+     * Closes the BIS
+     */
+    public static void closeBIS() {
+        try
+        {
+            bIS.close();
+        } 
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -129,6 +142,7 @@ public class Parser {
         try
         {
             output.write(outBytes);
+            output.close();
         } 
         catch (IOException e)
         {
