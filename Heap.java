@@ -9,6 +9,7 @@ public class Heap {
     private int[] array;
     private float[] arrayF;
     private int arraySize;
+    private int originalSize;
     /**
      * sets up the heapsorter with a given array (unsorted) each array should be
      * holding 8 blocks
@@ -22,9 +23,25 @@ public class Heap {
     {
         array = heapArray;
         arraySize = 512 * 8;
+        originalSize = arraySize;
         arrayF = arrayFloat;
     }
-
+    /**
+     * sets up the heapsorter with a given array (unsorted) each array should be
+     * holding 8 blocks
+     * 
+     * @param heapArray
+     *            unsorted array
+     * @param arrayFloat
+     *            unsorted array paired to heapArray
+     */
+    public Heap(int[] heapArray, float[] arrayFloat, int size)
+    {
+        array = heapArray;
+        arraySize = size;
+        originalSize = size;
+        arrayF = arrayFloat;
+    }
     /**
      * inserts into the heap
      * 
@@ -36,7 +53,7 @@ public class Heap {
      */
     public boolean insert(int data, float dataF)
     {
-        if (arraySize >= 512 * 8)
+        if (arraySize >= originalSize)
         {
             return false;
         }
@@ -60,6 +77,21 @@ public class Heap {
         {
             switchPositions(0, j);
             sift(j, 0);
+        }
+    }
+    /**
+     * sorts it backwards so the output array is in order
+     */
+    private void sortBackwards()
+    {
+        for (int i = arraySize / 2 - 1; i >= 0; i--)
+        {
+            siftOpposite(arraySize, i);
+        }
+        for (int j = arraySize - 1; j >= 0; j--)
+        {
+            switchPositions(0, j);
+            siftOpposite(j, 0);
         }
     }
     /**
@@ -193,7 +225,7 @@ public class Heap {
      */
     public int[] toArray()
     {
-        
+        sortBackwards();
         return array;
     }
 
@@ -204,6 +236,7 @@ public class Heap {
      */
     public float[] toArrayF()
     {
+        sortBackwards();
         return arrayF;
     }
 }
