@@ -9,7 +9,6 @@ public class Heap {
     private int[] array;
     private float[] arrayF;
     private int arraySize;
-
     /**
      * sets up the heapsorter with a given array (unsorted) each array should be
      * holding 8 blocks
@@ -63,7 +62,35 @@ public class Heap {
             sift(j, 0);
         }
     }
+    /**
+     * sorts the heap inversely
+     * 
+     * @param n
+     *            is the size of the heap
+     * @param i
+     *            is the root position
+     */
+    private void siftOpposite(int n, int i)
+    {
+        // go to last element
+        int big = i;
+        int l = getLeftChild(i);
+        int r = getRightChild(i);
 
+        if (l < n && arrayF[l] > arrayF[big])
+        {
+            big = l;
+        }
+        if (r < n && arrayF[r] > arrayF[big])
+        {
+            big = r;
+        }
+        if (big != i)
+        {
+            switchPositions(big, i);
+            sift(n, big);
+        }
+    }
     /**
      * sorts the heap
      * 
@@ -79,11 +106,11 @@ public class Heap {
         int l = getLeftChild(i);
         int r = getRightChild(i);
 
-        if (l < n && arrayF[l] > arrayF[big])
+        if (l < n && arrayF[l] < arrayF[big])
         {
             big = l;
         }
-        if (r < n && arrayF[r] > arrayF[big])
+        if (r < n && arrayF[r] < arrayF[big])
         {
             big = r;
         }
@@ -149,7 +176,6 @@ public class Heap {
         sift(arraySize, 0);
         return r;
     }
-
     /**
      * tells you if its empty or not
      * 
@@ -157,7 +183,7 @@ public class Heap {
      */
     public boolean isEmpty()
     {
-        return array[0] == 0;
+        return arraySize == 0;
     }
 
     /**
@@ -167,6 +193,7 @@ public class Heap {
      */
     public int[] toArray()
     {
+        
         return array;
     }
 

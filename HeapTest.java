@@ -29,12 +29,16 @@ public class HeapTest extends TestCase
         float[] sorted = h.toArrayF();
         int[] sortedIds = h.toArray();
         assertNotNull(sortedIds[0]);
-        for (int i = 0; i < 512 * 8 - 1; i++)
-        {
-            assertTrue(sorted[i] <= sorted[i + 1]);
-        }
         assertFalse(h.isEmpty());
-        h.deleteMin();
+        float[] out;
+        float f = 0;
+        int i = 0;
+        while(!h.isEmpty())
+        {
+            out = h.deleteMin();
+            System.out.println(i + " " + out[1]);
+            i++;
+        }
         assertTrue(h.insert(5, 9));
     }
 

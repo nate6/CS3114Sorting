@@ -38,11 +38,13 @@ public class Parser {
         byte[] bytes = new byte[512 * 8 * 8];
         try
         {
-            bIS.read(bytes, blockNumber * 512 * 8, 512 * 8);
+            bIS.skip((long) blockNumber * 512 * 8 * 8);
+            bIS.read(bytes, 0, 512 * 8 * 8);
+            bIS.close();
         }
-        catch (IOException e)
+        catch (IOException e1)
         {
-            e.printStackTrace();
+            e1.printStackTrace();
         }
         return ByteBuffer.wrap(bytes);
     }
@@ -71,11 +73,13 @@ public class Parser {
         byte[] bytes = new byte[length];
         try
         {
-            bIS.read(bytes, blockPosition, length);
+            bIS.skip((long) blockPosition);
+            bIS.read(bytes, 0, length);
+            bIS.close();
         }
-        catch (IOException e)
+        catch (IOException e1)
         {
-            e.printStackTrace();
+            e1.printStackTrace();
         }
         return ByteBuffer.wrap(bytes);
     }

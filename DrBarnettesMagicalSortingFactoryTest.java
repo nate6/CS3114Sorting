@@ -10,7 +10,9 @@ import student.TestCase;
  */
 public class DrBarnettesMagicalSortingFactoryTest extends TestCase
 {
-
+    /**
+     * tests sorting for the factory
+     */
     public void testSorting()
     {
         DrBarnettesMagicalSortingFactory b = new 
@@ -52,6 +54,9 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
             i++;
         }
     }
+    /**
+     * tests input for the Parser class
+     */
     public void testInput()
     {
         ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
@@ -61,8 +66,8 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
             i++;
             bB.getInt();
             bB.getFloat();
+            //System.out.println(i + " " + bB.getInt() + " " + bB.getFloat());
         }
-        System.out.println(i);
     }
 
 }

@@ -261,13 +261,8 @@ public class DrBarnettesMagicalSortingFactory {
         if (numRuns == 1)
         {
             //make outfile have contents of infile
-            FileInputStream fin = new FileInputStream(inFile);
-            RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
-            FileChannel in = fin.getChannel();
-            FileChannel out = fout.getChannel();
-            out.transferFrom(in, 0, in.size());
-            fin.close();
-            fout.close();
+            File file = new File(inFile);
+            copyFileToFile(file, outFile);
             return;
         }
         //i'm just going to merge 2 at a time
@@ -363,50 +358,85 @@ public class DrBarnettesMagicalSortingFactory {
                 }
             }
         }
-        if (b1.hasRemaining())
-        {
-            //need to output the rest of them
-            Parser.writeRecord(tempFile.getName(), b1.getInt(), b1.getFloat(), true);
-            pos1++;
-        }
-        while (b2.hasRemaining())
-        {
-            //need to output the rest of them
-            Parser.writeRecord(tempFile.getName(), b2.getInt(), b2.getFloat(), true);
-            pos2++;
-        }
-        int[] newPositions = new int[runPositions.length - 1];
-        int[] newLengths = new int[runLengths.length - 1];
-        newPositions[0] = runPositions[0] + runPositions[1];
-        newLengths[0] = runLengths[0] + runLengths[1];
+        writeLastOfValues(tempFile, b1);
+        writeLastOfValues(tempFile, b2);
+        int[] newPositions = arrayThings(runPositions);
+        int[] newLengths = arrayThings(runLengths);
         //write buffer to file
         if (newLengths.length == 1)
         {
             //output to outFile
-            RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
-            FileInputStream fin = new FileInputStream(tempFile);
-            FileChannel in = fin.getChannel();
-            FileChannel out = fout.getChannel();
-            out.transferFrom(in, 0, in.size());
-            fin.close();
-            fout.close();
+            copyFileToFile(tempFile, outFile);
         }
         else
         {
             //place the temp file's values into the inFile
-            Scanner scan = new Scanner(tempFile);
-            RandomAccessFile access = new RandomAccessFile(inFile, "rws");
-            while (scan.hasNext())
-            {
-                access.writeInt(scan.nextInt());
-                access.writeFloat(scan.nextFloat());
-            }
-            scan.close();
-            access.close();
+            writeInRun(tempFile, inFile);
             //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
         
+    }
+    /**
+     * writes the end of a buffer
+     * @param file file to be written to
+     * @param b bytebuffer containing the values
+     */
+    private void writeLastOfValues(File file, ByteBuffer b)
+    {
+        while(b.hasRemaining())
+        {
+            Parser.writeRecord(file.getName(), b.getInt(), b.getFloat(), true);
+        }
+    }
+    /**
+     * 
+     * @param array
+     * @return
+     */
+    private int[] arrayThings(int[] array)
+    {
+        int[] rArray = new int[array.length - 1];
+        for (int i = 1; i < array.length; i++)
+        {
+            rArray[i - 1] = array[i];
+        }
+        rArray[0] = array[0] + array[1];
+        return rArray;
+    }
+    /**
+     * copies a file to a different file
+     * @param inFile is the input file
+     * @param outFile is the output file
+     * @throws IOException
+     */
+    private void copyFileToFile(File inFile, String outFile) throws IOException
+    {
+        RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
+        FileInputStream fin = new FileInputStream(inFile);
+        FileChannel in = fin.getChannel();
+        FileChannel out = fout.getChannel();
+        out.transferFrom(in, 0, in.size());
+        fin.close();
+        fout.close();
+    }
+    /**
+     * writes the run to a file
+     * @param tempFile is the file holding run 1
+     * @param outFile is where it needs to go
+     * @throws IOException
+     */
+    private void writeInRun(File tempFile, String outFile) throws IOException
+    {
+        Scanner scan = new Scanner(tempFile);
+        RandomAccessFile access = new RandomAccessFile(outFile, "rws");
+        while (scan.hasNext())
+        {
+            access.writeInt(scan.nextInt());
+            access.writeFloat(scan.nextFloat());
+        }
+        scan.close();
+        access.close();
     }
     
 }
