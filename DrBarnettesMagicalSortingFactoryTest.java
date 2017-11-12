@@ -11,58 +11,70 @@ import student.TestCase;
 public class DrBarnettesMagicalSortingFactoryTest extends TestCase
 {
 
+    /**
+     * Tests the sorting
+     */
     public void testSorting()
     {
         DrBarnettesMagicalSortingFactory b = new 
                 DrBarnettesMagicalSortingFactory("8Blocks.bin", "Stat.txt");
         
-        ByteBuffer bB = Parser.readBlock(0, "8Blocks.bin");
+        Parser.setBIS("8Blocks.bin");
+        ByteBuffer bB = Parser.readBlock();
         Heap h = b.heapify(bB);
         float[] f = h.toArrayF();
         for (int i = 0; i < 512 * 8 - 1; i++)
         {
-            assertTrue(f[i] <= f[i+1]);
+            assertTrue(f[i] <= f[i + 1]);
         }
         //so its sorting correctly then
         //tests writing a buffer to the file
         b.writeHeap(h, "test.bin", false);
-        bB = Parser.readBlock(0, "test.bin");
-        while(bB.hasRemaining())
+        bB = Parser.readBlock();
+        while (bB.hasRemaining())
         {
             assertNotNull(bB.getInt());
         }
+        bB.clear();
     }
     /**
      * tests the parser methods
      */
     public void testOutput()
     {
+        Parser.setBIS("test.bin");
         ByteBuffer bB;
         Parser.writeRecord("test.bin", 0, 0, false);
         for (int i = 1; i < 50; i++)
         {
             Parser.writeRecord("test.bin", i, 4, true);
         }
-        bB = Parser.readBlock(0, "test.bin");
+        bB = Parser.readBlock();
         int i = 0;
-        while(bB.hasRemaining() && i < 50)
+        while (bB.hasRemaining() && i < 50)
         {
             assertEquals(i, bB.getInt());
             bB.getFloat();
             i++;
         }
+        bB.clear();
     }
+    /**
+     * Test inputs
+     */
     public void testInput()
     {
-        ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
+        Parser.setBIS("16Blocks.bin");
+        ByteBuffer bB = Parser.readBlock();
         int i = 0;
-        while(bB.hasRemaining())
+        while (bB.hasRemaining())
         {
+            assertNotNull(bB.getInt());
             i++;
-            bB.getInt();
             bB.getFloat();
         }
         System.out.println(i);
+        bB.clear();
     }
 
 }

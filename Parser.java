@@ -15,15 +15,13 @@ import java.nio.channels.FileChannel;
  * @version 11.10.2017
  */
 public class Parser {
+    private static BufferedInputStream bIS;
     
     /**
-     * reads in a block based on the block number
-     * @param blockNumber is the block number
-     * @param fileLocation of the file to read in
-     * @return a bytebuffer containing that block
+     * Sets the buffer stream for our file.
+     * @param fileLocation of our binary file
      */
-    public static ByteBuffer readBlock(int blockNumber, String fileLocation)
-    {
+    public static void setBIS(String fileLocation) {
         FileInputStream inFile = null;
         try
         {
@@ -33,12 +31,20 @@ public class Parser {
         {
             e.printStackTrace();
         }
-        BufferedInputStream bIS = new BufferedInputStream(inFile);
-        
+        bIS = new BufferedInputStream(inFile);
+        inFile.close();
+    }
+    
+    /**
+     * reads in a block based on the block number
+     * @return a bytebuffer containing that block
+     */
+    public static ByteBuffer readBlock()
+    {        
         byte[] bytes = new byte[512 * 8 * 8];
         try
         {
-            bIS.read(bytes, blockNumber * 512 * 8, 512 * 8);
+            bIS.read(bytes, 0, 512 * 8 * 8);
         }
         catch (IOException e)
         {
@@ -49,29 +55,15 @@ public class Parser {
     
     /**
      * reads in a block based on the block number
-     * @param blockPosition is the block position
-     * @param fileLocation of the file to read in
      * @param length of byte array
      * @return a bytebuffer containing that block
      */
-    public static ByteBuffer readRuns(int blockPosition, String fileLocation, 
-            int length)
-    {
-        FileInputStream inFile = null;
-        try
-        {
-            inFile = new FileInputStream(fileLocation);
-        } 
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        BufferedInputStream bIS = new BufferedInputStream(inFile);
-        
+    public static ByteBuffer readRuns(int length)
+    {        
         byte[] bytes = new byte[length];
         try
         {
-            bIS.read(bytes, blockPosition, length);
+            bIS.read(bytes, 0, length);
         }
         catch (IOException e)
         {
@@ -96,6 +88,7 @@ public class Parser {
             FileOutputStream fstream = new FileOutputStream(file, append);
             wChannel = fstream.getChannel();
             wChannel.write(b);
+            b.clear();
             fstream.close();
             wChannel.close();
         }
@@ -132,10 +125,12 @@ public class Parser {
         b.putInt(i);
         b.putFloat(f);
         byte[] outBytes = b.array();
+        b.clear();
         try
         {
             output.write(outBytes);
-        } catch (IOException e)
+        } 
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -151,3 +146,4 @@ public class Parser {
         return (int) f.length() / 8;
     }
 }
+

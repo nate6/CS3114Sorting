@@ -12,24 +12,22 @@ import java.nio.ByteBuffer;
 public class heapsortTest extends TestCase
 {
 
+    /**
+     * Tests the entire program
+     */
     public void testProgram()
     {
-        String[] args = {"1024Blocks.bin", "stat.txt"};
+        String[] args = {"8Blocks.bin", "stat.txt"};
         heapsort.main(args);
-        int k = 0;
-        //for (int i = 0; i < 1; i++) {
-            System.out.println("/---------------/: " + k);
-            ByteBuffer b = Parser.readBlock(k, "1024Blocks.bin");
-            while (b.hasRemaining())
-            {
-                float f = b.getFloat();
-                System.out.println(b.getInt() + " " + f);
-                //b.getInt();
-                assertNotNull(f);
-            }
-            //k++;
-        //}
         
+        Parser.setBIS("8Blocks.bin");
+        ByteBuffer b = Parser.readBlock();
+        while (b.hasRemaining()) {
+            float f = b.getFloat();
+            b.getInt();
+            assertNotNull(f);
+        }
+        b.clear();
     }
 
 }

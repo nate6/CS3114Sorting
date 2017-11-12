@@ -78,7 +78,7 @@ public class Heap {
         int big = i;
         int l = getLeftChild(i);
         int r = getRightChild(i);
-
+        
         if (l < n && arrayF[l] > arrayF[big])
         {
             big = l;
@@ -144,10 +144,47 @@ public class Heap {
     public float[] deleteMin()
     {
         float[] r = { array[0], arrayF[0] };
-        switchPositions(0, arraySize - 1);
+        switchPositions(0, arraySize - 1);    
         arraySize--;
-        sift(arraySize, 0);
+        siftDown(arraySize, 0);
         return r;
+    }
+    
+    /**
+     * sorts the heap downwards when swapping
+     * 
+     * @param n
+     *            is the size of the heap
+     * @param i
+     *            is the root position
+     */
+    private void siftDown(int n, int i)
+    {
+        int l = getLeftChild(i);
+        int r = getRightChild(i);
+        int m = 0;
+
+        if (r >= n) {
+            if (l >= n) {
+                return;
+            }
+            else {
+                m = l;
+            }
+        }
+        else {
+            if (arrayF[l] <= arrayF[r]) {
+                m = l;
+            }
+            else {
+                m = r;
+            }
+        }
+        
+        if (arrayF[i] > arrayF[m]) {
+            switchPositions(m, i);
+            sift(n, m);
+        }
     }
 
     /**
@@ -157,7 +194,7 @@ public class Heap {
      */
     public boolean isEmpty()
     {
-        return array[0] == 0;
+        return arraySize == 0 || arrayF[0] == 0;
     }
 
     /**
