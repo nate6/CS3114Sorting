@@ -120,7 +120,7 @@ public class DrBarnettesMagicalSortingFactory {
             runStart = runPos[runCount] + runLen[runCount];
             runCount++;
 
-            heap = new Heap(list, idxList, listF);
+            //heap = new Heap(list, idxList, listF);
             heap.sort();
             list = new int[512 * 8];
             listF = new float[512 * 8];
@@ -164,15 +164,13 @@ public class DrBarnettesMagicalSortingFactory {
      * @param output file name for runs
      */
     public void writeHeap(Heap heap, String output, Boolean append) {
-        int[] arrayI = heap.toArray();
-        float[] arrayF = heap.toArrayF();
-        Parser.writeRecord(output, arrayI[0], arrayF[0], append);
+        float[] array = heap.deleteMin();
+        Parser.writeRecord(output, (int) array[0], array[1], append);
         append = true;
-        for (int i = 1; i < heap.toArray().length; i++)
+        while (!heap.isEmpty())
         {
-            System.out.println(arrayF[i]);
-            Parser.writeRecord(output, arrayI[i], 
-                    arrayF[i], append);
+            array = heap.deleteMin();
+            Parser.writeRecord(output, (int) array[0], array[1], append);
         }
     }
     /**
