@@ -24,7 +24,7 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
         for (int i = 0; i < 512 * 8 - 1; i++)
         {
             //assertTrue(f[i] >= f[i+1]);
-            System.out.println(f[i]);
+            //System.out.println(f[i]);
         }
         //so its sorting correctly then
         //tests writing a buffer to the file

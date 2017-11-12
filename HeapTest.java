@@ -36,7 +36,6 @@ public class HeapTest extends TestCase
         while(!h.isEmpty())
         {
             out = h.deleteMin();
-            System.out.println(i + " " + out[1]);
             i++;
         }
         assertTrue(h.insert(5, 9));
