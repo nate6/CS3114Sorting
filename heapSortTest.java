@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  *         Nate Axt <nate6>
  * @version 11.10.2017
  */
-public class heapsortTest extends TestCase
+public class heapSortTest extends TestCase
 {
 
     public void testProgram()

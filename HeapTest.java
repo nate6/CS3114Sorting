@@ -25,6 +25,7 @@ public class HeapTest extends TestCase
         }
         Heap h = new Heap(array, arrayF);
         h.sort();
+        assertFalse(h.insert(1, 1));
         float[] sorted = h.toArrayF();
         int[] sortedIds = h.toArray();
         assertNotNull(sortedIds[0]);
