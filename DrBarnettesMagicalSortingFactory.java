@@ -170,6 +170,7 @@ public class DrBarnettesMagicalSortingFactory {
         append = true;
         for (int i = 1; i < heap.toArray().length; i++)
         {
+            //System.out.println(array[i]);
             Parser.writeRecord(output, arrayI[i], 
                     arrayF[i], append);
         }
