@@ -62,7 +62,7 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
             i++;
             bB.getInt();
             bB.getFloat();
-            System.out.println(i + " " + bB.getInt() + " " + bB.getFloat());
+            //System.out.println(i + " " + bB.getInt() + " " + bB.getFloat());
         }
     }
 
