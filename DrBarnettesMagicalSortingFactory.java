@@ -86,6 +86,7 @@ public class DrBarnettesMagicalSortingFactory {
                 if (nextF >= minPack[1]) {
                     if (nextF == minPack[1] && next < (int) minPack[0]) {
                         Parser.writeRecord(output, next, nextF, append);
+                        System.out.println(nextF);
                         runEnd++;
                     }
                     else {
@@ -100,6 +101,7 @@ public class DrBarnettesMagicalSortingFactory {
 
                 Parser.writeRecord(output, (int) minPack[0], 
                         minPack[1], append);
+                System.out.println(minPack[1]);
                 runEnd++;
 
                 if (!bBuffer.hasRemaining()) {
@@ -179,6 +181,7 @@ public class DrBarnettesMagicalSortingFactory {
         {
             array = heap.deleteMin();
             Parser.writeRecord(output, (int) array[0], array[1], append);
+            System.out.println(array[1]);
         }
     }
     
