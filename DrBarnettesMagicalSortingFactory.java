@@ -66,8 +66,8 @@ public class DrBarnettesMagicalSortingFactory {
         int blockNum = 1;
         ByteBuffer bBuffer = Parser.readBlock(blockNum, file);
         
-        int[] runPos = new int[16];
-        int[] runLen = new int[16];
+        int[] runPos = new int[length/512];
+        int[] runLen = new int[length/512];
         int runCount = 0;
         int runStart = 0;
         
@@ -76,6 +76,7 @@ public class DrBarnettesMagicalSortingFactory {
         int idxList = 0;
         
         do {
+            idxList = 0;
             int runEnd = 0;
             while (!heap.isEmpty()) {
                 float[] minPack = heap.deleteMin();
@@ -97,19 +98,20 @@ public class DrBarnettesMagicalSortingFactory {
                     idxList++;
                 }
 
-                Parser.writeRecord(output, (int) minPack[0], minPack[1], append);
+                Parser.writeRecord(output, (int) minPack[0], 
+                        minPack[1], append);
                 runEnd++;
 
                 if (!bBuffer.hasRemaining()) {
                     bBuffer.clear();
-                    blockNum++;
-                    bBuffer = Parser.readBlock(blockNum, file);
-                    int[][] runs = incrementRuns(runPos, runLen);
-                    runPos = runs[0];
-                    runLen = runs[1];
-                    if (blockNum * 512 * 8 > length) {
+                    if ((blockNum * 2) * 512 * 8 >= length) {
+                        runEnd += 512 * 8 - idxList;
                         writeHeap(heap, output, append);
                         break;
+                    }
+                    else {
+                        blockNum++;
+                        bBuffer = Parser.readBlock(blockNum, file);
                     }
                 }
                 append = true;
@@ -120,14 +122,20 @@ public class DrBarnettesMagicalSortingFactory {
             runStart = runPos[runCount] + runLen[runCount];
             runCount++;
 
-            heap = new Heap(list, listF);
+            heap = new Heap(list, listF, idxList);
             heap.sort();
             list = new int[512 * 8];
             listF = new float[512 * 8];
-        } while (blockNum * 512 * 8 > length && heap.isEmpty());
-        
+        } while (bBuffer.position() != 0);
+
+        int runEnd = idxList;
+        runPos[runCount] = runStart;
+        runLen[runCount] = runEnd;
         writeHeap(heap, output, append);
         
+        System.out.println(System.currentTimeMillis() - time); //TODO delete before submit
+        
+        Parser.fileClose();
         try {
             sortRuns(output, file, runPos, runLen);
         } 
@@ -172,22 +180,6 @@ public class DrBarnettesMagicalSortingFactory {
             array = heap.deleteMin();
             Parser.writeRecord(output, (int) array[0], array[1], append);
         }
-    }
-    /**
-     * Resizes runs arrays.
-     * @param runPos run positions array
-     * @param runLen run lengths array
-     * @return runPos and runLen with new sizes, filled, 
-     *         as a int[0][] and int[1][]
-     */
-    public int[][] incrementRuns(int[] runPos, int[] runLen)
-    {
-        int[][] runs = new int[2][runPos.length + 8];
-        for (int i = 0; i < runPos.length; i++) {
-            runs[0][i] = runPos[i];
-            runs[1][i] = runLen[i];
-        }
-        return runs;
     }
     
     /**
@@ -329,6 +321,7 @@ public class DrBarnettesMagicalSortingFactory {
             if (f1 < f2)
             {
                 //output f1
+                System.out.println(pos1*2-1); //TODO
                 Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
                         f1, append);
                 append = true;
@@ -374,7 +367,8 @@ public class DrBarnettesMagicalSortingFactory {
             //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
-        
+        Parser.fileClose();
+        Parser.closeOutput();
     }
     /**
      * writes the end of a buffer
@@ -385,7 +379,7 @@ public class DrBarnettesMagicalSortingFactory {
     {
         while(b.hasRemaining())
         {
-            Parser.writeRecord(file.getName(), b.getInt(), b.getFloat(), true);
+            Parser.writeRecordOutput(file.getName(), b.getInt(), b.getFloat(), true);
         }
     }
     /**
