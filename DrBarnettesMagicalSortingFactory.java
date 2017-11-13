@@ -287,7 +287,8 @@ public class DrBarnettesMagicalSortingFactory {
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
             //this is for if it hits the end of the block
-            if (pos1 == 512 * 8) {
+            if (pos1 == 512 * 8)
+            {
                 if (runLengths[0] - cap1 < 512 * 8)
                 {
                     b1 = Parser.readRuns(cap1, inFile, runLengths[0] - cap1);
@@ -348,13 +349,13 @@ public class DrBarnettesMagicalSortingFactory {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
                     append = true;
+                    cap1++;
                     pos1++;
-                    pos2++;
                 }
             }
         }
-        writeLastOfValues(tempFile, b1);
-        writeLastOfValues(tempFile, b2);
+        writeLastOfValues(tempFile, b1, cap1, runLengths[0]);
+        writeLastOfValues(tempFile, b2, cap2, runLengths[1]);
         int[] newPositions = arrayThings(runPositions);
         int[] newLengths = arrayThings(runLengths);
         //write buffer to file
@@ -378,10 +379,23 @@ public class DrBarnettesMagicalSortingFactory {
      * @param file file to be written to
      * @param b bytebuffer containing the values
      */
-    private void writeLastOfValues(File file, ByteBuffer b)
+    private void writeLastOfValues(File file, ByteBuffer b, int length, int max)
     {
-        while(b.hasRemaining())
+        while(length < max || b.hasRemaining())
         {
+            if (!b.hasRemaining())
+            {
+                //read in next part of run
+                if (max - length < 512 * 8)
+                {
+                    b = Parser.readRuns(length, file.getName(), max - length);
+                }
+                else
+                {
+                    b = Parser.readRuns(length, file.getName(), 512 * 8 * 8);
+                }
+            }
+            length++;
             Parser.writeRecordOutput(file.getName(), b.getInt(), b.getFloat(), true);
         }
     }
