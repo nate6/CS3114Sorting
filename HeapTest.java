@@ -1,4 +1,6 @@
 import student.TestCase;
+
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -25,19 +27,26 @@ public class HeapTest extends TestCase
         }
         Heap h = new Heap(array, arrayF);
         h.sort();
+        
         assertFalse(h.insert(1, 1));
-        float[] sorted = h.toArrayF();
-        int[] sortedIds = h.toArray();
         assertFalse(h.isEmpty());
-        float[] out;
-        float f = 0;
+        
+        float mLast = 0.0f;
+        while(!h.isEmpty())
+        {
+            float[] m = h.deleteMin();
+            assertTrue(m[1] >= mLast);
+            mLast = m[1];
+        }
+        
         int i = 0;
         while(!h.isEmpty())
         {
-            out = h.deleteMin();
-            System.out.println(out[1]);
+            h.deleteMin();
             i++;
         }
+        assertTrue(h.isEmpty());
+        assertEquals(0, i);
         assertTrue(h.insert(5, 9));
     }
 

@@ -73,11 +73,6 @@ public class Heap {
         {
             sift(arraySize, i);
         }
-        for (int j = arraySize - 1; j >= 0; j--)
-        {
-            switchPositions(0, j);
-            sift(j, 0);
-        }
     }
     /**
      * sorts the heap
