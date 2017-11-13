@@ -56,6 +56,7 @@ public class DrBarnettesMagicalSortingFactory {
     public void replacementSort(String output) {
         
         int length = Parser.getLength(file);
+        System.out.println(length/512);//TODO
         Heap heap = heapify(Parser.readBlock(0, file));
         Boolean append = false;
         if (length == 512 * 8) {
@@ -66,8 +67,8 @@ public class DrBarnettesMagicalSortingFactory {
         int blockNum = 1;
         ByteBuffer bBuffer = Parser.readBlock(blockNum, file);
         
-        int[] runPos = new int[16];
-        int[] runLen = new int[16];
+        int[] runPos = new int[length/512];
+        int[] runLen = new int[length/512];
         int runCount = 0;
         int runStart = 0;
         
@@ -97,19 +98,20 @@ public class DrBarnettesMagicalSortingFactory {
                     idxList++;
                 }
 
-                Parser.writeRecord(output, (int) minPack[0], minPack[1], append);
+                Parser.writeRecord(output, (int) minPack[0], 
+                        minPack[1], append);
                 runEnd++;
 
                 if (!bBuffer.hasRemaining()) {
                     bBuffer.clear();
-                    blockNum++;
-                    bBuffer = Parser.readBlock(blockNum, file);
-                    int[][] runs = incrementRuns(runPos, runLen);
-                    runPos = runs[0];
-                    runLen = runs[1];
-                    if (blockNum * 512 * 8 > length) {
+                    if (blockNum * 512 * 8 >= length) {
+                        runEnd += 512 * 8 - idxList;
                         writeHeap(heap, output, append);
                         break;
+                    }
+                    else {
+                        blockNum++;
+                        bBuffer = Parser.readBlock(blockNum, file);
                     }
                 }
                 append = true;
@@ -120,12 +122,16 @@ public class DrBarnettesMagicalSortingFactory {
             runStart = runPos[runCount] + runLen[runCount];
             runCount++;
 
-            //heap = new Heap(list, idxList, listF);
+            heap = new Heap(list, listF, idxList);
             heap.sort();
             list = new int[512 * 8];
             listF = new float[512 * 8];
-        } while (blockNum * 512 * 8 > length && heap.isEmpty());
-        
+            idxList = 0;
+        } while (blockNum * 512 * 8 < length && !heap.isEmpty());
+
+        int runEnd = 512 * 8 - idxList;
+        runPos[runCount] = runStart;
+        runLen[runCount] = runEnd;
         writeHeap(heap, output, append);
         
         try {

@@ -146,7 +146,7 @@ public class Parser {
     }
     
     /**
-     * Gets the length of the given file
+     * Gets the number of all the records the given file
      * @param file to check
      * @return byte length of that file
      */
