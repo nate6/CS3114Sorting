@@ -120,7 +120,7 @@ public class DrBarnettesMagicalSortingFactory {
             runStart = runPos[runCount] + runLen[runCount];
             runCount++;
 
-            //heap = new Heap(list, idxList, listF);
+            heap = new Heap(list, listF);
             heap.sort();
             list = new int[512 * 8];
             listF = new float[512 * 8];

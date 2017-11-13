@@ -16,16 +16,11 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
     public void testSorting()
     {
         DrBarnettesMagicalSortingFactory b = new 
-                DrBarnettesMagicalSortingFactory("8Blocks.bin", "Stat.txt");
+                DrBarnettesMagicalSortingFactory("16Blocks.bin", "Stat.txt");
         
-        ByteBuffer bB = Parser.readBlock(0, "8Blocks.bin");
+        ByteBuffer bB = Parser.readBlock(0, "16Blocks.bin");
         Heap h = b.heapify(bB);
         float[] f = h.toArrayF();
-        for (int i = 0; i < 512 * 8 - 1; i++)
-        {
-            //assertTrue(f[i] >= f[i+1]);
-            //System.out.println(f[i]);
-        }
         //so its sorting correctly then
         //tests writing a buffer to the file
         b.writeHeap(h, "test.bin", false);
@@ -60,14 +55,14 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
      */
     public void testInput()
     {
-        ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
+        ByteBuffer bB = Parser.readBlock(0, "8Blocks.bin");
         int i = 0;
         while(bB.hasRemaining())
         {
             i++;
             bB.getInt();
             bB.getFloat();
-            //System.out.println(i + " " + bB.getInt() + " " + bB.getFloat());
+            System.out.println(i + " " + bB.getInt() + " " + bB.getFloat());
         }
     }
 
