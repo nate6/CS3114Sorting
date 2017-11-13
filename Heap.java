@@ -80,50 +80,6 @@ public class Heap {
         }
     }
     /**
-     * sorts it backwards so the output array is in order
-     */
-    private void sortBackwards()
-    {
-        for (int i = arraySize / 2 - 1; i >= 0; i--)
-        {
-            siftOpposite(arraySize, i);
-        }
-        for (int j = arraySize - 1; j >= 0; j--)
-        {
-            switchPositions(0, j);
-            siftOpposite(j, 0);
-        }
-    }
-    /**
-     * sorts the heap inversely
-     * 
-     * @param n
-     *            is the size of the heap
-     * @param i
-     *            is the root position
-     */
-    private void siftOpposite(int n, int i)
-    {
-        // go to last element
-        int big = i;
-        int l = getLeftChild(i);
-        int r = getRightChild(i);
-
-        if (l < n && arrayF[l] > arrayF[big])
-        {
-            big = l;
-        }
-        if (r < n && arrayF[r] > arrayF[big])
-        {
-            big = r;
-        }
-        if (big != i)
-        {
-            switchPositions(big, i);
-            sift(n, big);
-        }
-    }
-    /**
      * sorts the heap
      * 
      * @param n
@@ -225,7 +181,6 @@ public class Heap {
      */
     public int[] toArray()
     {
-        sortBackwards();
         return array;
     }
 
@@ -236,7 +191,6 @@ public class Heap {
      */
     public float[] toArrayF()
     {
-        sortBackwards();
         return arrayF;
     }
 }
