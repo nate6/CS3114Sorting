@@ -14,12 +14,12 @@ public class heapSortTest extends TestCase
 
     public void testProgram()
     {
-        String[] args = {"8Blocks.bin", "stat.txt"};
+        String[] args = {"16Blocks.bin", "stat.txt"};
         heapsort.main(args);
         int k = 0;
         //for (int i = 0; i < 1; i++) {
             System.out.println("/---------------/: " + k);
-            ByteBuffer b = Parser.readBlock(k, "8Blocks.bin");
+            ByteBuffer b = Parser.readBlock(k, "16Blocks.bin");
             while (b.hasRemaining())
             {
                 float f = b.getFloat();

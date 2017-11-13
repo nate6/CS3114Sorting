@@ -56,7 +56,6 @@ public class DrBarnettesMagicalSortingFactory {
     public void replacementSort(String output) {
         
         int length = Parser.getLength(file);
-        System.out.println(length/512);//TODO
         Heap heap = heapify(Parser.readBlock(0, file));
         Boolean append = false;
         if (length == 512 * 8) {
@@ -77,6 +76,7 @@ public class DrBarnettesMagicalSortingFactory {
         int idxList = 0;
         
         do {
+            idxList = 0;
             int runEnd = 0;
             while (!heap.isEmpty()) {
                 float[] minPack = heap.deleteMin();
@@ -104,7 +104,7 @@ public class DrBarnettesMagicalSortingFactory {
 
                 if (!bBuffer.hasRemaining()) {
                     bBuffer.clear();
-                    if (blockNum * 512 * 8 >= length) {
+                    if ((blockNum * 2) * 512 * 8 >= length) {
                         runEnd += 512 * 8 - idxList;
                         writeHeap(heap, output, append);
                         break;
@@ -126,14 +126,16 @@ public class DrBarnettesMagicalSortingFactory {
             heap.sort();
             list = new int[512 * 8];
             listF = new float[512 * 8];
-            idxList = 0;
-        } while (blockNum * 512 * 8 < length && !heap.isEmpty());
+        } while (bBuffer.position() != 0);
 
-        int runEnd = 512 * 8 - idxList;
+        int runEnd = idxList;
         runPos[runCount] = runStart;
         runLen[runCount] = runEnd;
         writeHeap(heap, output, append);
         
+        System.out.println(System.currentTimeMillis() - time); //TODO delete before submit
+        
+        Parser.fileClose();
         try {
             sortRuns(output, file, runPos, runLen);
         } 
@@ -178,22 +180,6 @@ public class DrBarnettesMagicalSortingFactory {
             array = heap.deleteMin();
             Parser.writeRecord(output, (int) array[0], array[1], append);
         }
-    }
-    /**
-     * Resizes runs arrays.
-     * @param runPos run positions array
-     * @param runLen run lengths array
-     * @return runPos and runLen with new sizes, filled, 
-     *         as a int[0][] and int[1][]
-     */
-    public int[][] incrementRuns(int[] runPos, int[] runLen)
-    {
-        int[][] runs = new int[2][runPos.length + 8];
-        for (int i = 0; i < runPos.length; i++) {
-            runs[0][i] = runPos[i];
-            runs[1][i] = runLen[i];
-        }
-        return runs;
     }
     
     /**
@@ -335,6 +321,7 @@ public class DrBarnettesMagicalSortingFactory {
             if (f1 < f2)
             {
                 //output f1
+                System.out.println(pos1*2-1); //TODO
                 Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
                         f1, append);
                 append = true;
@@ -380,7 +367,8 @@ public class DrBarnettesMagicalSortingFactory {
             //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
-        
+        Parser.fileClose();
+        Parser.closeOutput();
     }
     /**
      * writes the end of a buffer
@@ -391,7 +379,7 @@ public class DrBarnettesMagicalSortingFactory {
     {
         while(b.hasRemaining())
         {
-            Parser.writeRecord(file.getName(), b.getInt(), b.getFloat(), true);
+            Parser.writeRecordOutput(file.getName(), b.getInt(), b.getFloat(), true);
         }
     }
     /**
