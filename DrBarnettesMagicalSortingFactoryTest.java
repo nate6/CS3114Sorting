@@ -16,7 +16,7 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
     public void testSorting()
     {
         DrBarnettesMagicalSortingFactory b = new 
-                DrBarnettesMagicalSortingFactory("8Blocks.bin", "Stat.txt");
+                DrBarnettesMagicalSortingFactory("16Blocks.bin", "Stat.txt");
         
         ByteBuffer bB = Parser.readBlock(0, "16Blocks.bin");
         Heap h = b.heapify(bB);
@@ -54,7 +54,7 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
      */
     public void testInput()
     {
-        ByteBuffer bB = Parser.readBlock(0, "8Blocks.bin");
+        ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
         int i = 0;
         while(bB.hasRemaining())
         {

@@ -400,6 +400,7 @@ public class DrBarnettesMagicalSortingFactory {
         {
             if (!b.hasRemaining())
             {
+                b.clear();
                 //read in next part of run
                 if (max - length < 512 * 8)
                 {
