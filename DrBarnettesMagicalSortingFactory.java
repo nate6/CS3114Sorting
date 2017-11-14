@@ -284,15 +284,12 @@ public class DrBarnettesMagicalSortingFactory {
         float f2 = b2.getFloat();
         while (cap1 < runLengths[0] && cap2 < runLengths[1])
         {
-            System.out.println(pos1 + " " + pos2 + "vs: " + runLengths[1] + " " + runLengths[1]);
             //this is for if it hits the end of the block
             if (pos1 == 512 * 8)
             {
-                System.out.println(pos1);
                 if (runLengths[0] - cap1 < 512 * 8)
                 {
                     b1 = Parser.readRuns(cap1 * 8, inFile, (runLengths[0] - cap1) * 8);
-                    System.out.println("reads next block");
                 }
                 else
                 {
@@ -302,7 +299,6 @@ public class DrBarnettesMagicalSortingFactory {
             }
             if (pos2 == 512 * 8)
             {
-                System.out.println(pos2);
                 if (runLengths[1] - cap2 < 512 * 8)
                 {
                     b2 = Parser.readRuns(cap2 * 8, inFile, (runLengths[0] - cap2) * 8);
@@ -401,7 +397,7 @@ public class DrBarnettesMagicalSortingFactory {
         int i = 0;
         float f = 0;
         int x = 0;
-        while(length < max && b.hasRemaining())
+        while(length < max)
         {
             x++;
             if (!b.hasRemaining())
@@ -414,6 +410,14 @@ public class DrBarnettesMagicalSortingFactory {
                 else
                 {
                     b = Parser.readRuns(length, file.getName(), 512 * 8 * 8);
+                }
+                if (max - length < 512 * 8)
+                {
+                    b = Parser.readRuns(length * 8, file.getName(), (max - length) * 8);
+                }
+                else
+                {
+                    b = Parser.readRuns(length * 8, file.getName(), 512 * 8 * 8);
                 }
             }
             length++;
