@@ -20,15 +20,14 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
         
         ByteBuffer bB = Parser.readBlock(0, "16Blocks.bin");
         Heap h = b.heapify(bB);
-        float[] f = h.toArrayF();
         //so its sorting correctly then
         //tests writing a buffer to the file
-        b.writeHeap(h, "test.bin", false);
-        bB = Parser.readBlock(0, "test.bin");
-        while(bB.hasRemaining())
-        {
-            assertNotNull(bB.getInt());
-        }
+        //b.writeHeap(h, "test.bin", false);
+        //bB = Parser.readBlock(0, "test.bin");
+        //while(bB.hasRemaining())
+        //{
+            //assertNotNull(bB.getInt());
+        //}
     }
     /**
      * tests the parser methods
@@ -55,7 +54,7 @@ public class DrBarnettesMagicalSortingFactoryTest extends TestCase
      */
     public void testInput()
     {
-        ByteBuffer bB = Parser.readBlock(0, "16Blocks.bin");
+        ByteBuffer bB = Parser.readBlock(1, "16Blocks.bin");
         int i = 0;
         while(bB.hasRemaining())
         {

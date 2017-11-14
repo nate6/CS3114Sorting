@@ -264,11 +264,11 @@ public class DrBarnettesMagicalSortingFactory {
             //the 512 * 8 records are read in
         if (runLengths[0] < 512 * 8)
         {
-            b1 = Parser.readRuns(runPositions[0] * 8, inFile, runLengths[0] * 8);
+            b1 = Parser.readRuns(0, inFile, runLengths[0] * 8);
         }
         else
         {
-            b1 = Parser.readRuns(runPositions[0] * 8, inFile, 512 * 8 * 8);
+            b1 = Parser.readRuns(0, inFile, 512 * 8 * 8);
         }
         if (runLengths[1] < 512 * 8)
         {
@@ -282,15 +282,17 @@ public class DrBarnettesMagicalSortingFactory {
         int i2 = b2.getInt();
         float f1 = b1.getFloat();
         float f2 = b2.getFloat();
-        while (pos1 < runLengths[0] && pos2 < runLengths[1])
+        while (cap1 < runLengths[0] && cap2 < runLengths[1])
         {
+            System.out.println(pos1 + " " + pos2 + "vs: " + runLengths[1] + " " + runLengths[1]);
             //this is for if it hits the end of the block
-            System.out.println(f1 + " or " + f2);
             if (pos1 == 512 * 8)
             {
+                System.out.println(pos1);
                 if (runLengths[0] - cap1 < 512 * 8)
                 {
                     b1 = Parser.readRuns(cap1 * 8, inFile, (runLengths[0] - cap1) * 8);
+                    System.out.println("reads next block");
                 }
                 else
                 {
@@ -300,6 +302,7 @@ public class DrBarnettesMagicalSortingFactory {
             }
             if (pos2 == 512 * 8)
             {
+                System.out.println(pos2);
                 if (runLengths[1] - cap2 < 512 * 8)
                 {
                     b2 = Parser.readRuns(cap2 * 8, inFile, (runLengths[0] - cap2) * 8);
@@ -314,7 +317,7 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f2
                 Parser.writeRecord(tempFile.getName(), i2, f2, append);
-                System.out.println(i2 + " f2 " + f2);
+                //System.out.println(currentPos + " " + i2 + " " + f2);
                 i2 = b2.getInt();
                 f2 = b2.getFloat();
                 append = true;
@@ -325,7 +328,7 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f1
                 Parser.writeRecord(tempFile.getName(), i1, f1, append);
-                System.out.println(i1 + "  f1 " + f1);
+                //System.out.println(i1 + " " + f1);
                 append = true;
                 i1 = b1.getInt();
                 f1 = b1.getFloat();
@@ -338,7 +341,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i2
                     Parser.writeRecord(tempFile.getName(), i2, f2, append);
-                    System.out.println(i2 + " " + f2);
+                    //System.out.println(currentPos + " " + i2 + " " + f2);
                     append = true;
                     i2 = b2.getInt();
                     f2 = b2.getFloat();
@@ -349,7 +352,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
-                    System.out.println(i1 + " " + f1);
+                    //System.out.println(currentPos + " " + i1 + " " + f1);
                     append = true;
                     i1 = b1.getInt();
                     f1 = b1.getFloat();
@@ -357,7 +360,6 @@ public class DrBarnettesMagicalSortingFactory {
                     pos1++;
                 }
             }
-            System.out.println("");
         }
         writeLastOfValues(tempFile, b1, cap1, runLengths[0]);
         writeLastOfValues(tempFile, b2, cap2, runLengths[1]);
@@ -398,8 +400,10 @@ public class DrBarnettesMagicalSortingFactory {
     {
         int i = 0;
         float f = 0;
+        int x = 0;
         while(length < max && b.hasRemaining())
         {
+            x++;
             if (!b.hasRemaining())
             {
                 //read in next part of run
@@ -420,7 +424,7 @@ public class DrBarnettesMagicalSortingFactory {
         b.clear();
     }
     /**
-     * 
+     * does things to the array to make it ready for the next output
      * @param array
      * @return
      */
@@ -443,13 +447,15 @@ public class DrBarnettesMagicalSortingFactory {
      */
     private void copyFileToFile(File inFile, String outFile) throws IOException
     {
-        RandomAccessFile fout = new RandomAccessFile(outFile, "rws");
-        FileInputStream fin = new FileInputStream(inFile);
-        FileChannel in = fin.getChannel();
-        FileChannel out = fout.getChannel();
-        out.transferFrom(in, 0, in.size());
-        fin.close();
-        fout.close();
+        ByteBuffer b = Parser.readBlock(0, inFile.getName());
+        Parser.writeToFile(outFile, b, false);
+        int numBlocks = Parser.getLength(inFile.getName()) / (512 * 8);
+        while(numBlocks > 0)
+        {
+            b = Parser.readBlock(numBlocks, inFile.getName());
+            Parser.writeToFile(outFile, b, true);
+            numBlocks--;
+        }
     }
     /**
      * writes the run to a file
