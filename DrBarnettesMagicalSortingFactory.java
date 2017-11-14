@@ -315,7 +315,6 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f2
                 Parser.writeRecord(tempFile.getName(), i2, f2, append);
-                System.out.println(f2);
                 i2 = b2.getInt();
                 f2 = b2.getFloat();
                 append = true;
@@ -326,7 +325,6 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f1
                 Parser.writeRecord(tempFile.getName(), i1, f1, append);
-                System.out.println(f1);
                 append = true;
                 i1 = b1.getInt();
                 f1 = b1.getFloat();
@@ -339,7 +337,6 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i2
                     Parser.writeRecord(tempFile.getName(), i2, f2, append);
-                    System.out.println(f2);
                     append = true;
                     i2 = b2.getInt();
                     f2 = b2.getFloat();
@@ -350,7 +347,6 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
-                    System.out.println(f1);
                     append = true;
                     i1 = b1.getInt();
                     f1 = b1.getFloat();
@@ -417,7 +413,6 @@ public class DrBarnettesMagicalSortingFactory {
             length++;
             i = b.getInt();
             f = b.getFloat();
-            System.out.println(i + " " + f);
             Parser.writeRecordOutput(file.getName(), i, f, true);
         }
         b.clear();
