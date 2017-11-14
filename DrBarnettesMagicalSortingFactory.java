@@ -396,20 +396,18 @@ public class DrBarnettesMagicalSortingFactory {
     {
         int i = 0;
         float f = 0;
-        int x = 0;
         while(length < max)
         {
-            x++;
             if (!b.hasRemaining())
             {
                 //read in next part of run
                 if (max - length < 512 * 8)
                 {
-                    b = Parser.readRuns(length, file.getName(), max - length);
+                    b = Parser.readRuns(length * 8, file.getName(), (max - length) * 8);
                 }
                 else
                 {
-                    b = Parser.readRuns(length, file.getName(), 512 * 8 * 8);
+                    b = Parser.readRuns(length * 8, file.getName(), 512 * 8 * 8);
                 }
                 if (max - length < 512 * 8)
                 {
@@ -419,6 +417,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     b = Parser.readRuns(length * 8, file.getName(), 512 * 8 * 8);
                 }
+                System.out.println("ended block@" + length);
             }
             length++;
             i = b.getInt();
