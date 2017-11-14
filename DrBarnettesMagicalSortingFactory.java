@@ -133,8 +133,6 @@ public class DrBarnettesMagicalSortingFactory {
         runLen[runCount] = runEnd;
         writeHeap(heap, output, append);
         
-        
-        Parser.fileClose();
         try {
             sortRuns(output, file, runPos, runLen);
         } 
@@ -388,8 +386,6 @@ public class DrBarnettesMagicalSortingFactory {
             //out
             sortRuns(inFile, outFile, newPositions, newLengths);
         }
-        Parser.fileClose();
-        Parser.closeOutput();
     }
     /**
      * writes the end of a buffer
@@ -418,7 +414,7 @@ public class DrBarnettesMagicalSortingFactory {
             i = b.getInt();
             f = b.getFloat();
             System.out.println(i + " " + f);
-            Parser.writeRecordOutput(file.getName(), i, f, true);
+            Parser.writeRecord(file.getName(), i, f, true);
         }
         b.clear();
     }

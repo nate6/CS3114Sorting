@@ -15,9 +15,7 @@ import java.nio.channels.FileChannel;
  * @version 11.10.2017
  */
 public class Parser {
-    private static FileOutputStream output;
-    private static FileOutputStream temp;
-    
+
     /**
      * reads in a block based on the block number
      * @param blockNumber is the block number
@@ -125,7 +123,7 @@ public class Parser {
     public static void writeRecord(String fileName, int i, float f, 
             boolean append)
     {
-        temp = null;
+        FileOutputStream temp = null;
         try
         {
             temp = new FileOutputStream(fileName, append);
@@ -141,64 +139,9 @@ public class Parser {
         try
         {
             temp.write(outBytes);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Closes the current file
-     */
-    public static void fileClose() {
-        try {
             temp.close();
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * outputs a record to a given file
-     * @param fileName is the given file
-     * @param i is the id value
-     * @param f is the key value
-     * @param append is if it is appending or not
-     */
-    public static void writeRecordOutput(String fileName, int i, float f, 
-            boolean append)
-    {
-        output = null;
-        try
-        {
-            output = new FileOutputStream(fileName, append);
-        }
-        catch (FileNotFoundException e1)
-        {
-            e1.printStackTrace();
-        }
-        ByteBuffer b = ByteBuffer.allocate(8);
-        b.putInt(i);
-        b.putFloat(f);
-        byte[] outBytes = b.array();
-        try
-        {
-            output.write(outBytes);
         } catch (IOException e)
         {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Closes the current file
-     */
-    public static void closeOutput() {
-        try {
-            output.close();
-        } 
-        catch (IOException e) {
             e.printStackTrace();
         }
     }
