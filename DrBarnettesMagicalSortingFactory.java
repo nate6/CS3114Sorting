@@ -86,7 +86,6 @@ public class DrBarnettesMagicalSortingFactory {
                 if (nextF >= minPack[1]) {
                     if (nextF == minPack[1] && next < (int) minPack[0]) {
                         Parser.writeRecord(output, next, nextF, append);
-                        System.out.println(nextF);
                         runEnd++;
                     }
                     else {
@@ -101,7 +100,6 @@ public class DrBarnettesMagicalSortingFactory {
 
                 Parser.writeRecord(output, (int) minPack[0], 
                         minPack[1], append);
-                System.out.println(minPack[1]);
                 runEnd++;
 
                 if (!bBuffer.hasRemaining()) {
@@ -135,7 +133,6 @@ public class DrBarnettesMagicalSortingFactory {
         runLen[runCount] = runEnd;
         writeHeap(heap, output, append);
         
-        System.out.println(System.currentTimeMillis() - time); //TODO delete before submit
         
         Parser.fileClose();
         try {
@@ -181,7 +178,6 @@ public class DrBarnettesMagicalSortingFactory {
         {
             array = heap.deleteMin();
             Parser.writeRecord(output, (int) array[0], array[1], append);
-            System.out.println(array[1]);
         }
     }
     
@@ -287,7 +283,7 @@ public class DrBarnettesMagicalSortingFactory {
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
             //this is for if it hits the end of the block
-            System.out.println(pos1 + " " + pos2);
+            System.out.println(pos1 + " " + pos2 + " runLs: " + runLengths[0] + " " + runLengths[1]);
             if (pos1 == 512 * 8)
             {
                 if (runLengths[0] - cap1 < 512 * 8)
@@ -312,8 +308,8 @@ public class DrBarnettesMagicalSortingFactory {
                 }
                 pos2 = 0;
             }
-            float f1 = b1.getFloat(pos1 * 2);
-            float f2 = b2.getFloat(pos2 * 2);
+            float f1 = b1.getFloat(2 * pos1 + 1);
+            float f2 = b2.getFloat(2 * pos2 + 1);
             if (f1 > f2)
             {
                 //output f2
@@ -324,14 +320,14 @@ public class DrBarnettesMagicalSortingFactory {
                 }
                 else
                 {
-                    Parser.writeRecord(tempFile.getName(), b2.getInt(pos2 * 2 - 1),
+                    Parser.writeRecord(tempFile.getName(), b2.getInt(pos2),
                             f2, append);
                 }
                 append = true;
                 pos2++;
                 cap2++;
             }
-            if (f1 < f2)
+            else if (f1 < f2)
             {
                 //output f1
                 if (pos1 == 0)
@@ -341,17 +337,17 @@ public class DrBarnettesMagicalSortingFactory {
                 }
                 else
                 {
-                    Parser.writeRecord(tempFile.getName(), b1.getInt(pos1 * 2 - 1),
+                    Parser.writeRecord(tempFile.getName(), b1.getInt(pos1),
                             f1, append);
                 }
                 append = true;
                 pos1++;
                 cap1++;
             }
-            if (f1 == f2)
+            else
             {
-                int i1 = b1.getInt(pos1 * 2 - 1);
-                int i2 = b2.getInt(pos2 * 2 - 1);
+                int i1 = b1.getInt(pos1 * 2);
+                int i2 = b2.getInt(pos2 * 2);
                 if (i1 > i2)
                 {
                     //output i2
