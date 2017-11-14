@@ -256,17 +256,17 @@ public class DrBarnettesMagicalSortingFactory {
             return;
         }
         //i'm just going to merge 2 at a time
-        int pos1 = 0;
-        int pos2 = 0;
-        int cap1 = 0;
-        int cap2 = 0;
+        int pos1 = 1;
+        int pos2 = 1;
+        int cap1 = 1;
+        int cap2 = 1;
         ByteBuffer b1;
         ByteBuffer b2;
         //reads in the runs, if they are larger than an 8block then only
             //the 512 * 8 records are read in
         if (runLengths[0] < 512 * 8)
         {
-            b1 = Parser.readRuns(runPositions[0], inFile, runLengths[0]);
+            b1 = Parser.readRuns(runPositions[0], inFile, runLengths[0] * 8);
         }
         else
         {
@@ -274,16 +274,22 @@ public class DrBarnettesMagicalSortingFactory {
         }
         if (runLengths[1] < 512 * 8)
         {
-            b2 = Parser.readRuns(runPositions[1], inFile, runLengths[1]);
+            b2 = Parser.readRuns(runPositions[1], inFile, runLengths[1] * 8);
         }
         else
         {
             b2 = Parser.readRuns(runPositions[1], inFile, 512 * 8 * 8);
         }
+        int i1 = b1.getInt();
+        int i2 = b2.getInt();
+        float f1 = b1.getFloat();
+        float f2 = b2.getFloat();
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
+            //TODO
             //this is for if it hits the end of the block
-            System.out.println(pos1 + " " + pos2 + " runLs: " + runLengths[0] + " " + runLengths[1]);
+            //System.out.println(b1.position() + " " + pos1 + " " + b2.position() + " " + pos2 + " runLs: " + runLengths[0] + " " + runLengths[1]);
+            //System.out.println(currentF1 + " " + currentF2);
             if (pos1 == 512 * 8)
             {
                 if (runLengths[0] - cap1 < 512 * 8)
@@ -308,21 +314,13 @@ public class DrBarnettesMagicalSortingFactory {
                 }
                 pos2 = 0;
             }
-            float f1 = b1.getFloat(2 * pos1 + 1);
-            float f2 = b2.getFloat(2 * pos2 + 1);
             if (f1 > f2)
             {
                 //output f2
-                if (pos2 == 0)
-                {
-                    Parser.writeRecord(tempFile.getName(), b2.getInt(0),
+                Parser.writeRecord(tempFile.getName(), i2,
                             f2, append);
-                }
-                else
-                {
-                    Parser.writeRecord(tempFile.getName(), b2.getInt(pos2),
-                            f2, append);
-                }
+                i2 = b2.getInt();
+                f2 = b2.getFloat();
                 append = true;
                 pos2++;
                 cap2++;
@@ -330,29 +328,23 @@ public class DrBarnettesMagicalSortingFactory {
             else if (f1 < f2)
             {
                 //output f1
-                if (pos1 == 0)
-                {
-                    Parser.writeRecord(tempFile.getName(), b1.getInt(0),
+                Parser.writeRecord(tempFile.getName(), i1,
                             f1, append);
-                }
-                else
-                {
-                    Parser.writeRecord(tempFile.getName(), b1.getInt(pos1),
-                            f1, append);
-                }
                 append = true;
+                i1 = b1.getInt();
+                f1 = b1.getFloat();
                 pos1++;
                 cap1++;
             }
             else
             {
-                int i1 = b1.getInt(pos1 * 2);
-                int i2 = b2.getInt(pos2 * 2);
                 if (i1 > i2)
                 {
                     //output i2
                     Parser.writeRecord(tempFile.getName(), i2, f2, append);
                     append = true;
+                    i2 = b2.getInt();
+                    f2 = b2.getFloat();
                     pos2++;
                     cap2++;
                 }
@@ -361,6 +353,8 @@ public class DrBarnettesMagicalSortingFactory {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
                     append = true;
+                    i1 = b1.getInt();
+                    f1 = b1.getFloat();
                     cap1++;
                     pos1++;
                 }
@@ -370,8 +364,20 @@ public class DrBarnettesMagicalSortingFactory {
         writeLastOfValues(tempFile, b2, cap2, runLengths[1]);
         int[] newPositions = arrayThings(runPositions);
         int[] newLengths = arrayThings(runLengths);
+        
         //write buffer to file
-        if (newLengths.length == 1)
+        
+        int position = 1;
+        for (int num = 0; num < newLengths.length; num++)
+        {
+            if (runLengths[num] == 0)
+            {
+                position = num - 1;
+                break;
+            }
+        }
+
+        if (position == 1)
         {
             //output to outFile
             copyFileToFile(tempFile, outFile);
@@ -393,7 +399,9 @@ public class DrBarnettesMagicalSortingFactory {
      */
     private void writeLastOfValues(File file, ByteBuffer b, int length, int max)
     {
-        while(length < max || b.hasRemaining())
+        int i = 0;
+        float f = 0;
+        while(length < max && b.hasRemaining())
         {
             if (!b.hasRemaining())
             {
@@ -408,8 +416,11 @@ public class DrBarnettesMagicalSortingFactory {
                 }
             }
             length++;
-            Parser.writeRecordOutput(file.getName(), b.getInt(), b.getFloat(), true);
+            i = b.getInt();
+            f = b.getFloat();
+            Parser.writeRecordOutput(file.getName(), i, f, true);
         }
+        b.clear();
     }
     /**
      * 
@@ -418,12 +429,13 @@ public class DrBarnettesMagicalSortingFactory {
      */
     private int[] arrayThings(int[] array)
     {
-        int[] rArray = new int[array.length - 1];
+        int[] rArray = new int[array.length];
+        rArray[0] = array[0] + array[1];
         for (int i = 1; i < array.length; i++)
         {
             rArray[i - 1] = array[i];
         }
-        rArray[0] = array[0] + array[1];
+        rArray[array.length - 1] = 0;
         return rArray;
     }
     /**
