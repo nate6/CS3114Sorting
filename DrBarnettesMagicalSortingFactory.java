@@ -264,19 +264,19 @@ public class DrBarnettesMagicalSortingFactory {
             //the 512 * 8 records are read in
         if (runLengths[0] < 512 * 8)
         {
-            b1 = Parser.readRuns(runPositions[0], inFile, runLengths[0] * 8);
+            b1 = Parser.readRuns(runPositions[0] * 8, inFile, runLengths[0] * 8);
         }
         else
         {
-            b1 = Parser.readRuns(runPositions[0], inFile, 512 * 8 * 8);
+            b1 = Parser.readRuns(runPositions[0] * 8, inFile, 512 * 8 * 8);
         }
         if (runLengths[1] < 512 * 8)
         {
-            b2 = Parser.readRuns(runPositions[1], inFile, runLengths[1] * 8);
+            b2 = Parser.readRuns(runPositions[1] * 8, inFile, runLengths[1] * 8);
         }
         else
         {
-            b2 = Parser.readRuns(runPositions[1], inFile, 512 * 8 * 8);
+            b2 = Parser.readRuns(runPositions[1] * 8, inFile, 512 * 8 * 8);
         }
         int i1 = b1.getInt();
         int i2 = b2.getInt();
@@ -285,15 +285,16 @@ public class DrBarnettesMagicalSortingFactory {
         while (pos1 < runLengths[0] && pos2 < runLengths[1])
         {
             //this is for if it hits the end of the block
+            System.out.println(f1 + " or " + f2);
             if (pos1 == 512 * 8)
             {
                 if (runLengths[0] - cap1 < 512 * 8)
                 {
-                    b1 = Parser.readRuns(cap1, inFile, runLengths[0] - cap1);
+                    b1 = Parser.readRuns(cap1 * 8, inFile, (runLengths[0] - cap1) * 8);
                 }
                 else
                 {
-                    b1 = Parser.readRuns(cap1, inFile, 512 * 8 * 8);
+                    b1 = Parser.readRuns(cap1 * 8, inFile, 512 * 8 * 8);
                 }
                 pos1 = 0;
             }
@@ -301,11 +302,11 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 if (runLengths[1] - cap2 < 512 * 8)
                 {
-                    b2 = Parser.readRuns(cap2, inFile, runLengths[0] - cap2);
+                    b2 = Parser.readRuns(cap2 * 8, inFile, (runLengths[0] - cap2) * 8);
                 }
                 else
                 {
-                    b2 = Parser.readRuns(cap2, inFile, 512 * 8 * 8);
+                    b2 = Parser.readRuns(cap2 * 8, inFile, 512 * 8 * 8);
                 }
                 pos2 = 0;
             }
@@ -313,6 +314,7 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f2
                 Parser.writeRecord(tempFile.getName(), i2, f2, append);
+                System.out.println(i2 + " f2 " + f2);
                 i2 = b2.getInt();
                 f2 = b2.getFloat();
                 append = true;
@@ -323,6 +325,7 @@ public class DrBarnettesMagicalSortingFactory {
             {
                 //output f1
                 Parser.writeRecord(tempFile.getName(), i1, f1, append);
+                System.out.println(i1 + "  f1 " + f1);
                 append = true;
                 i1 = b1.getInt();
                 f1 = b1.getFloat();
@@ -335,6 +338,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i2
                     Parser.writeRecord(tempFile.getName(), i2, f2, append);
+                    System.out.println(i2 + " " + f2);
                     append = true;
                     i2 = b2.getInt();
                     f2 = b2.getFloat();
@@ -345,6 +349,7 @@ public class DrBarnettesMagicalSortingFactory {
                 {
                     //output i1
                     Parser.writeRecord(tempFile.getName(), i1, f1, append);
+                    System.out.println(i1 + " " + f1);
                     append = true;
                     i1 = b1.getInt();
                     f1 = b1.getFloat();
@@ -352,6 +357,7 @@ public class DrBarnettesMagicalSortingFactory {
                     pos1++;
                 }
             }
+            System.out.println("");
         }
         writeLastOfValues(tempFile, b1, cap1, runLengths[0]);
         writeLastOfValues(tempFile, b2, cap2, runLengths[1]);
