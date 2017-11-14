@@ -34,6 +34,8 @@ public class Heap {
      *            unsorted array
      * @param arrayFloat
      *            unsorted array paired to heapArray
+     * @param size
+     *            size for heap
      */
     public Heap(int[] heapArray, float[] arrayFloat, int size)
     {
@@ -167,25 +169,5 @@ public class Heap {
     public boolean isEmpty()
     {
         return arraySize == 0;
-    }
-
-    /**
-     * gives you the int array
-     * 
-     * @return the int array
-     */
-    public int[] toArray()
-    {
-        return array;
-    }
-
-    /**
-     * gives you the float array
-     * 
-     * @return the float array
-     */
-    public float[] toArrayF()
-    {
-        return arrayF;
     }
 }

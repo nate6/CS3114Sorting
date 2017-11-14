@@ -140,7 +140,8 @@ public class Parser {
         {
             temp.write(outBytes);
             temp.close();
-        } catch (IOException e)
+        } 
+        catch (IOException e)
         {
             e.printStackTrace();
         }
